@@ -24,6 +24,7 @@ public:
 	const char * getPath();
 	const char * getHost();
 	uint16_t getPort();
+	evhttp_cmd_type getCommand(); 		
 	const char * findHeaders(const char * key);
 
 	bool setHeader(const char * key, const char * value);
