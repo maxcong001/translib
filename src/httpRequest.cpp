@@ -41,6 +41,11 @@ uint16_t HttpRequest::getPort()
 	return evhttp_uri_get_port(evhttp_request_get_evhttp_uri(_req));
 }
 
+evhttp_cmd_type HttpRequest::getCommand()
+{
+	return evhttp_request_get_command(_req);
+}
+
 const char * HttpRequest::findHeaders(const char * key)
 {
 	return evhttp_find_header(evhttp_request_get_input_headers(_req), key);
