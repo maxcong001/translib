@@ -16,7 +16,7 @@ namespace translib
 {
 
 /**
- * @brief TCP连接基类
+ * @brief TCP base 
  */
 class TcpSocket
 {
@@ -24,36 +24,37 @@ public:
 	TcpSocket();
 	virtual ~TcpSocket();
 
-	/** 获取socket */
+	/** get socket */
 	SocketFd socket() const;
-	/** 获取连接地址 */
+	/** get connection address */
 	void getAddr(struct sockaddr_in * dest, uint32_t size) const;
 
 	/**
-	 * @brief 发送数据
-	 * @param data 数据地址
-	 * @param size 数据字节大小
-	 * @return 返回是否成功
+	 * @brief send message
+	 * @param data the address of data
+	 * @param size 
+	 * @return 
 	 */
 	bool send(const char *data, uint32_t size);
 
 	/**
-	 * @brief 关闭连接
-	 * @param waiting 是否等待数据发送完再关闭
+	 * @brief close connection
+	 * @param waiting: close after sending the data
 	 */
 	void close(bool waiting = true);
 
-	/** 获取收数据缓冲区数据长度 */
+	/** get data length in the catche */
 	uint32_t getInputBufferLength() const;
-	/** 查看收数据缓冲区 */
+	/** view input buffer */
 	const uint8_t * viewInputBuffer(uint32_t size) const;
-	/** 读取收数据缓冲区 */
+	/** read input buffer */
 	bool readInputBuffer(uint8_t * dest, uint32_t size);
-	/** 清空收数据缓冲区 */
+	/** clear input buffer */
 	void clearInputBuffer();
 
 protected:
-	//子类需要调用此接口检查正在关闭的数据
+
+	// son need to call this interface to check the closing connection
 	void checkClosing();
 
 private:

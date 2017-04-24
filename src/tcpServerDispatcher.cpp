@@ -46,7 +46,7 @@ void TcpServerDispatcher::onFrame()
 	{
 		SessionAction & action = _actions.front();
 
-		if (action.sock != SOCKET_FD_INVALID) //新加session
+		if (action.sock != SOCKET_FD_INVALID) //add session
 		{
 			TcpSessionPtr session = server()->sessionFactory()->create();
 			if (session->attach(this, action.id, action.sock))
@@ -54,7 +54,7 @@ void TcpServerDispatcher::onFrame()
 				_sessions[session->id()] = session;
 			}
 		}
-		else //删除session
+		else //delete session
 		{
 			_sessions.erase(action.id);
 		}

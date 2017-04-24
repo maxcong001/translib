@@ -2,7 +2,7 @@
 // Name        : test.cpp
 // Author      : 
 // Version     :
-// Copyright   : xiaceng.com
+// Copyright   :  
 // Description : Hello World in C++, Ansi-style
 //============================================================================
 #include <iostream>
@@ -15,7 +15,7 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-	string cmd = "timer";
+	string cmd = "tcp";
 	if (argc > 1) {
 		cmd = argv[1];
 	}

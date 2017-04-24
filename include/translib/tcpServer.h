@@ -19,8 +19,8 @@ namespace translib
 {
 
 /**
- * @brief TCP服务器
- * @details 其包含了一个监听线程和多个IO线程
+ * @brief TCP server
+ * @details one listen thread multi IO thread
  */
 class TcpServer
 {
@@ -30,53 +30,40 @@ public:
 	TcpServer(translib::TcpSessionFactory * sessionFactory = NULL, uint16_t threads = 0);
 	virtual ~TcpServer();
 
-	/** 设置IO线程数量，需在监听之前调用 */
+	/** set IO thread num. need to be called before listen*/
 	void setThreads(uint16_t threads);
 
-	/** 获取Loop对象引用 */
 	inline translib::Loop & getMasterLoop() const
 	{
 		return *_master;
 	}
 
-	/** 获取Session工厂类 */
 	inline translib::TcpSessionFactory * sessionFactory() const
 	{
 		return _sessionFactory;
 	}
 
-	/**
-	 * @brief 监听
-	 * @param ip 服务器IP地址
-	 * @param port 服务器监听端口
-	 * @return 返回是否成功
-	 */
+
 	bool listen(const char *ip, uint16_t port);
 
-	/** 停止 */
 	void stop();
 
-	/** 等待所有线程结束 */
+	/** wait for each thread to exit */
 	void wait();
 
 protected:
-	/**
-	 * @brief 监听失败时处理接口
-	 * @details 比如监听端口被占用时
-	 */
+
 	virtual void onListenError() {};
 
 	/**
-	 * @brief 连接有数据可读时处理接口
-	 * @note TcpSession数据可读时默认行为是通知TcpServer，重载TcpSession的onRead函数修改
+	 * @brief when there is data ready.
+	 * @note when there is data ready in TcpSession, report to TcpServer by default.over ride member function onRead of TcpSession
 	 * @see TcpSession::onRead
 	 */
 	virtual void onSessionRead(translib::TcpSession *session) {};
 
-	/** 连接断开时处理接口 */
 	virtual void onSessionDisconnected(translib::TcpSession *session) {};
 
-	/** 有新连接时处理接口 */
 	virtual void onNewSession(translib::TcpSession *session) {};
 
 private:

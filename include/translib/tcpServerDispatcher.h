@@ -19,8 +19,8 @@ namespace translib
 class TcpServer;
 
 /**
- * @brief TCP服务器会话调度管理器
- * @details TcpServer负责监听连接，然后分配给TcpServerDispatcher管理
+ * @brief TCP dispatcher
+ * @details TcpServer for listen. then assign to TcpServerDispatcher
  * @see translib::TcpServer
  */
 class TcpServerDispatcher : public translib::FrameLoop
@@ -35,17 +35,15 @@ class TcpServerDispatcher : public translib::FrameLoop
 public:
 	TcpServerDispatcher(TcpServer *server);
 
-	/** @brief 返回所在TCPServer */
 	inline translib::TcpServer * server() const
 	{
 		return _server;
 	}
 
-	/** 根据id获取Session */
 	translib::TcpSessionPtr getSession(translib::SessionId id);
-	/** 添加Session */
+
 	void addSession(translib::SessionId id, translib::SocketFd sock);
-	/** 删除Session */
+
 	void removeSession(translib::SessionId id);
 
 protected:

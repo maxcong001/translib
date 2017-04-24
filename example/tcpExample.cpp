@@ -97,7 +97,7 @@ protected:
 			_client.connect("127.0.0.1", 4567);
 		}
 
-		if (_timer.curRound() >= 3)
+		if (_timer.curRound() >= 30)
 		{
 			ExampleTcpServer::instance().stop();
 			stop();

@@ -16,8 +16,8 @@ namespace translib
 class Timer;
 
 /**
- * @brief 拥有幀定时器的事件循环
- * @details 由于有无限循环定时器，所以一直存在已注册的事件，不会有自动结束。默认幀时长为10毫秒
+ * @brief event loop with frame ttimer
+ * @details as there is infinite timer, so it exist in the registerd event forever. default frame timer is 10ms
  */
 class FrameLoop : public translib::Loop {
 	typedef Loop Super;
@@ -26,30 +26,27 @@ public:
 	virtual ~FrameLoop();
 
 	/**
-	 * @brief 设置幀时长(毫秒)
-	 * @note 应该在启动事件循环调用
-	 * @details 没调用此函数则默认幀时长为10毫秒
-	 * @param interval 幀时长(毫秒)，为0不会生效
+	 * set frame interval 
+	 * @note should be called in the start event loop
+	 * @details defalt is 10 ms if this function is not called
+	 * @param interval  not usable if interval is set to 0
 	 * @see Loop::start
 	 */
 	void setFrameInterval(uint32_t interval);
 
-	/** @brief 获取当前幀周期 */
+	/** get current round */
 	uint64_t curFrameRound() const;
 
 protected:
-	/** @override */
+
 	virtual void onBeforeLoop();
 
-	/**
-	 * @brief 每幀事件处理
-	 */
 	virtual void onFrame();
 
 private:
-	//幀定时器
+	//timer of frame
 	Timer * _frameTimer;
-	//幀时长(毫秒)
+	//frame interval in ms
 	uint32_t _frameInterval;
 };
 
