@@ -1,3 +1,4 @@
+#include "ringbuffer.hpp"
 struct tcp_message_header
 {
     long version;
@@ -48,6 +49,17 @@ struct tcp_message
         header.buf = buf;
         return this;
     }
+
+
+    tcp_message *get_message(ring_buffer &buffer)
+    {
+        tcp_message *_buf = (tcp_message *)(buffer.get_element());
+        if (!(_buf->is_valid()))
+        {
+            return NULL;
+        }
+    }
+
     // this fucntion form the TCP message
     // note: you need to free the input memory after calling this function.
     // this functin will re-alloc memory, will change it to realloc() later
@@ -69,16 +81,7 @@ struct tcp_message
             return NULL;
         }
         
-        return msg_ptr;
-    }
-
-    tcp_message *get_message(ring_buffer &buffer)
-    {
-        tcp_message *_buf = (tcp_message *)(buffer.get_element());
-        if (!(_buf->is_valid()))
-        {
-            return NULL;
-        }
+        return this;
     }
 
     void on_message(tcp_message *)
@@ -98,9 +101,7 @@ tcp_message *form_msg(char *buf, size_t len)
     delete msg;
     return ret_ptr;
 }
-std::mutex message_mutex;
-std::condition_variable message_cond;
-typedef std::unique_lock<std::mutex> message_lock;
+
 // this function will wait for the signal from translib and then read the ring_buffer
 // if the signal do not come, just wait here
 void get_message(ring_buffer &buffer)
@@ -113,23 +114,6 @@ void get_message(ring_buffer &buffer)
         // wait for the signal from translib
         message_lock _lock(message_mutex);
         message_cond.wait(_lock);
-        // now we got a ring buffer message
-        // 1.1 if there is no message between two ring buffer message element
-        tcp_message *_buf = (tcp_message *)(buffer.get_element());
-        if (!(_buf->is_valid()))
-        {
-            continue;
-        }
-        left_p = get_message(_buff, RB_ELEMENT_SIZE, num_after, have_next);
-    }
-}
-// this function get a message in a ring buffer
-char *bool get_message(tcp_message *buff, int num_before, int &num_after, bool &have_next)
-{
-    while (1)
-    {
-        if (buff->len <= num_before)
-        {
-        }
+
     }
 }

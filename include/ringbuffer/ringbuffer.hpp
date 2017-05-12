@@ -32,6 +32,12 @@
 using namespace std;
 #define RB_SIZE 1024
 #define RB_ELEMENT_SIZE 4096
+
+
+std::mutex message_mutex;
+std::condition_variable message_cond;
+typedef std::unique_lock<std::mutex> message_lock;
+
 class ring_buffer
 {
   public:
