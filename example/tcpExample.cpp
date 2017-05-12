@@ -7,6 +7,8 @@
 
 #include <iostream>
 #include <functional>
+#include <thread>
+#include <chrono>
 using namespace std;
 
 #include "translib/loop.h"
@@ -58,21 +60,25 @@ protected:
 
 	virtual void onSessionRead(translib::TcpSession *session)
 	{
-		char* buff = _ring_buffer.get_add();
+		char* buff = _ring_buffer.peek_head_p();
 		if (!buff)
 		{
-			cout << "ring buffer is full!"<< endl;
+			cout << "get buffer ptr "<<(void*)buff<<endl;
 			return;
 		}
 		uint32_t length = session->getInputBufferLength();
 		session->readInputBuffer((uint8_t *)buff, length);
 
-		// just for test
-		_ring_buffer.del();
+		while(!_ring_buffer.add(length, buff))
+		{
+			std::this_thread::yield();
+			std::this_thread::sleep_for (std::chrono::milliseconds(1));
+		}
+
+		cout << "ring buffer size "<< _ring_buffer.size()<<endl;
 
 		cout << "ExampleTcpServer::" << __FUNCTION__
 				<< " " << session->id() << " data:" << (void*)buff << endl;
-
 	}
 
 	virtual void onSessionDisconnected(translib::TcpSession *session)
