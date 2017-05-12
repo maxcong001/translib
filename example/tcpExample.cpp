@@ -13,7 +13,7 @@ using namespace std;
 #include "translib/tcpServer.h"
 #include "translib/tcpClient.h"
 #include "translib/timer.h"
-
+#include "ringbuffer/ringbuffer.hpp"
 #include "index.h"
 
 class ExampleTcpClient : public translib::TcpClient
@@ -22,6 +22,7 @@ public:
 	ExampleTcpClient(const translib::Loop &loop):
 		translib::TcpClient(loop)
 	{}
+
 
 protected:
 	virtual void onRead()
@@ -57,14 +58,21 @@ protected:
 
 	virtual void onSessionRead(translib::TcpSession *session)
 	{
+		char* buff = _ring_buffer.get_add();
+		if (!buff)
+		{
+			cout << "ring buffer is full!"<< endl;
+			return;
+		}
 		uint32_t length = session->getInputBufferLength();
-		char * buff = new char[length + 1];
 		session->readInputBuffer((uint8_t *)buff, length);
-		buff[length] = '\0';
+
+		// just for test
+		_ring_buffer.del();
+
 		cout << "ExampleTcpServer::" << __FUNCTION__
-				<< " " << session->id() << " data:" << buff << endl;
-		delete [] buff;
-		session->close();
+				<< " " << session->id() << " data:" << (void*)buff << endl;
+
 	}
 
 	virtual void onSessionDisconnected(translib::TcpSession *session)
@@ -76,6 +84,8 @@ protected:
 	{
 		cout << "ExampleTcpServer::" << __FUNCTION__ << session->id() << endl;
 	}
+public:
+	ring_buffer _ring_buffer;
 };
 
 class ExampleTcpClientManager : public translib::Loop
@@ -85,7 +95,7 @@ public:
 		_client(*this),
 		_timer(*this)
 	{
-		_timer.startForever(1000, std::bind(&ExampleTcpClientManager::tick, this));
+		_timer.startForever(10, std::bind(&ExampleTcpClientManager::tick, this));
 	}
 
 protected:
@@ -96,8 +106,10 @@ protected:
 		{
 			_client.connect("127.0.0.1", 4567);
 		}
+		char buffer[10000];
+		_client.send(buffer, 10000);
 
-		if (_timer.curRound() >= 30)
+		if (_timer.curRound() >= 30000)
 		{
 			ExampleTcpServer::instance().stop();
 			stop();
