@@ -1,5 +1,5 @@
 #include "ringbuffer.hpp"
-#define MAX_MSG_LEN 10*1024
+#define MAX_MSG_LEN 10 * 1024
 struct tcp_message_header
 {
     long version;
@@ -20,15 +20,15 @@ struct tcp_message
     tcp_message()
     {
         header.version = 1;
-        memcpy(header.magic_num, "Magic", 5);// = {'M', 'a', 'g', 'i', 'c'};
+        memcpy(header.magic_num, "Magic", 5); // = {'M', 'a', 'g', 'i', 'c'};
         header.message_len = 0;
         header.reserved = 0;
         buf = NULL;
     }
-    tcp_message(char* msg, size_t length)
+    tcp_message(char *msg, size_t length)
     {
         header.version = 1;
-        memcpy(header.magic_num, "Magic", 5);// = {'M', 'a', 'g', 'i', 'c'};
+        memcpy(header.magic_num, "Magic", 5); // = {'M', 'a', 'g', 'i', 'c'};
         header.message_len = length;
         header.reserved = 0;
         buf = msg;
@@ -46,7 +46,7 @@ struct tcp_message
 
     size_t get_len()
     {
-        cout << "message header length is : " << sizeof(tcp_message_header)<<endl;
+        cout << "message header length is : " << sizeof(tcp_message_header) << endl;
         return (header.message_len + sizeof(tcp_message_header));
     }
 
@@ -63,16 +63,15 @@ struct tcp_message
         return this;
     }
 
-
-    bool get_message(ring_buffer &buffer, char* out_msg)
+    bool get_message(ring_buffer &buffer, char *out_msg)
     {
-        cout << "in function get_message()"<< endl;
+        cout << "in function get_message()" << endl;
 
         tcp_message_header tmp_header;
-        (buffer.peek(sizeof(tcp_message_header), (char*)(&tmp_header)));
+        (buffer.peek(sizeof(tcp_message_header), (char *)(&tmp_header)));
         tcp_message_header *header_p = &tmp_header;
 
-        cout << "get message header, pointer is : "<< (void *)header_p<<endl;
+        cout << "get message header, pointer is : " << (void *)header_p << endl;
         if (!header_p)
         {
             return false;
@@ -96,32 +95,30 @@ struct tcp_message
         }
         else
         {
-            cout <<"get message fail"<<endl;
+            cout << "get message fail" << endl;
             return false;
         }
         return true;
     }
 
-
-    bool raw_msg(char* buff, size_t buff_len = 0)
+    bool raw_msg(char *buff, size_t buff_len = 0)
     {
         if (buff_len == 0)
         {
             // do not care buffer length
         }
-        else if (((this->header).message_len + sizeof(tcp_message_header)) > buff_len) 
+        else if (((this->header).message_len + sizeof(tcp_message_header)) > buff_len)
         {
             return false;
         }
         memcpy(buff, &(this->header), sizeof(tcp_message_header));
         memcpy(buff + sizeof(tcp_message_header), this->buf, (this->header).message_len);
         return true;
-
     }
 
-    void on_message(tcp_message * msg, size_t msg_len)
+    void on_message(tcp_message *msg, size_t msg_len)
     {
-        cout <<"in the function on_message()" << endl;
+        cout << "in the function on_message()" << endl;
         /*
         on_message_f _cb;
         _cb = get_message_cb();
@@ -135,5 +132,3 @@ struct tcp_message
 
     //ring_buffer _ring_buffer;
 };
-
-
