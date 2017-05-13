@@ -132,10 +132,7 @@ struct tcp_message
         }
         */
     }
-    void set_message_cb(on_message_f msg_cb) { cb = msg_cb; };
-    on_message_f get_message_cb() { return cb; };
-  private:
-    on_message_f cb;
+
     //ring_buffer _ring_buffer;
 };
 

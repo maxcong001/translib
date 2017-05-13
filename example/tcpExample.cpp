@@ -143,7 +143,7 @@ class ExampleTcpClientManager : public translib::Loop
 	char tmp_str[1000] = "test";
 
 	tcp_message tmp_msg;
-    tmp_msg.set_message_cb(cb_func);
+
 	tmp_msg.form_msg(tmp_str, dice_roll);//sizeof(tmp_str));
     cout<< "try to send out message with size : "<< dice_roll <<endl;
     cout<< "payload size is : " << tmp_msg.get_len() << endl;
