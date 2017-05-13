@@ -29,6 +29,7 @@
 #include <string.h>
 #include <atomic>
 #include <memory>
+#include <condition_variable> 
 using namespace std;
 #define RB_SIZE 1024
 #define RB_ELEMENT_SIZE 4096

@@ -1,4 +1,5 @@
 #include "ringbuffer.hpp"
+#define MAX_MSG_LEN 10*1024
 struct tcp_message_header
 {
     long version;
@@ -19,22 +20,33 @@ struct tcp_message
     tcp_message()
     {
         header.version = 1;
-        header.magic_num = {'M', 'a', 'g', 'i', 'c'};
+        memcpy(header.magic_num, "Magic", 5);// = {'M', 'a', 'g', 'i', 'c'};
         header.message_len = 0;
         header.reserved = 0;
         buf = NULL;
     }
+    tcp_message(char* msg, size_t length)
+    {
+        header.version = 1;
+        memcpy(header.magic_num, "Magic", 5);// = {'M', 'a', 'g', 'i', 'c'};
+        header.message_len = length;
+        header.reserved = 0;
+        buf = msg;
+    }
     ~tcp_message()
     {
     }
+    // this function check if the message is valid
     bool is_valid()
     {
-        string tmp_str(&header.magic_num, 5);
+        string tmp_str(header.magic_num, 5);
         return (tmp_str == "Magic");
     }
+    // this function return the whole message length
 
     size_t get_len()
     {
+        cout << "message header length is : " << sizeof(tcp_message_header)<<endl;
         return (header.message_len + sizeof(tcp_message_header));
     }
 
@@ -45,75 +57,86 @@ struct tcp_message
     // note, need to provide the message address and free the message after usage.
     tcp_message *form_msg(char *buff, size_t len)
     {
+
         header.message_len = len;
-        header.buf = buf;
+        buf = buff;
         return this;
     }
 
 
-    tcp_message *get_message(ring_buffer &buffer)
+    bool get_message(ring_buffer &buffer, char* out_msg)
     {
-        tcp_message *_buf = (tcp_message *)(buffer.get_element());
-        if (!(_buf->is_valid()))
+        cout << "in function get_message()"<< endl;
+
+        tcp_message_header tmp_header;
+        (buffer.peek(sizeof(tcp_message_header), (char*)(&tmp_header)));
+        tcp_message_header *header_p = &tmp_header;
+
+        cout << "get message header, pointer is : "<< (void *)header_p<<endl;
+        if (!header_p)
         {
-            return NULL;
+            return false;
         }
+
+        if (!(((tcp_message *)header_p)->is_valid()))
+        {
+            cout << "get the message in the ring buffer fail, valid check fail" << endl;
+            return false;
+        }
+
+        int message_len = 0;
+        message_len = (header_p->message_len) + sizeof(tcp_message_header);
+
+        cout << "int get_message() : get message with length :" << message_len << endl;
+        //length = message_len;
+        if (buffer.get(message_len, out_msg))
+        {
+            cout << "get message success" << endl;
+            on_message((tcp_message *)out_msg, message_len);
+        }
+        else
+        {
+            cout <<"get message fail"<<endl;
+            return false;
+        }
+        return true;
     }
 
-    // this fucntion form the TCP message
-    // note: you need to free the input memory after calling this function.
-    // this functin will re-alloc memory, will change it to realloc() later
-    tcp_message *append_msg(tcp_message *msg, char *buf, size_t len)
+
+    bool raw_msg(char* buff, size_t buff_len = 0)
     {
-        size_t msg_len = msg->message_len + len + sizeof(tcp_message_header);
-        // use realloc later
-        char *msg_ptr = malloc(msg_len);
-        if (!msg_ptr)
+        if (buff_len == 0)
         {
-            return NULL;
+            // do not care buffer length
         }
-        if (!memcpy(msg_ptr, msg, msg->message_len + sizeof(tcp_message_header)))
+        else if (((this->header).message_len + sizeof(tcp_message_header)) > buff_len) 
         {
-            return NULL;
+            return false;
         }
-        if (!memcpy(msg_ptr + len, buf, len))
-        {
-            return NULL;
-        }
-        
-        return this;
+        memcpy(buff, &(this->header), sizeof(tcp_message_header));
+        memcpy(buff + sizeof(tcp_message_header), this->buf, (this->header).message_len);
+        return true;
+
     }
 
-    void on_message(tcp_message *)
+    void on_message(tcp_message * msg, size_t msg_len)
     {
-        (get_message_cb())(tcp_message *);
+        cout <<"in the function on_message()" << endl;
+        /*
+        on_message_f _cb;
+        _cb = get_message_cb();
+
+        if (_cb)
+        {
+            _cb(msg, msg_len);
+        }
+        */
     }
     void set_message_cb(on_message_f msg_cb) { cb = msg_cb; };
     on_message_f get_message_cb() { return cb; };
   private:
     on_message_f cb;
+    //ring_buffer _ring_buffer;
 };
-// this fucntion format a new message, delete the memory after use.
-tcp_message *form_msg(char *buf, size_t len)
-{
-    tcp_message msg = new tcp_message();
-    tcp_message *ret_ptr = append_msg(msg, buf, len);
-    delete msg;
-    return ret_ptr;
-}
 
-// this function will wait for the signal from translib and then read the ring_buffer
-// if the signal do not come, just wait here
-void get_message(ring_buffer &buffer)
-{
-    bool have_next = true;
-    int num_left = 0;
-    char *left_p = NULL;
-    while (1)
-    {
-        // wait for the signal from translib
-        message_lock _lock(message_mutex);
-        message_cond.wait(_lock);
 
-    }
-}
