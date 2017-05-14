@@ -9,11 +9,6 @@ struct tcp_message_header
 };
 struct tcp_message
 {
-
-    // note: this return the pointer to the memory,
-    // please use quickly and no need to free the memory
-    typedef std::function<void(tcp_message *, int)> on_message_f;
-
     tcp_message_header header;
     char *buf;
 
@@ -46,7 +41,7 @@ struct tcp_message
 
     size_t get_len()
     {
-        cout << "message header length is : " << sizeof(tcp_message_header) << endl;
+        //cout << "message header length is : " << sizeof(tcp_message_header) << endl;
         return (header.message_len + sizeof(tcp_message_header));
     }
 
@@ -91,7 +86,7 @@ struct tcp_message
         if (buffer.get(message_len, out_msg))
         {
             cout << "get message success" << endl;
-            on_message((tcp_message *)out_msg, message_len);
+            //on_message((tcp_message *)out_msg, message_len);
         }
         else
         {
@@ -115,20 +110,22 @@ struct tcp_message
         memcpy(buff + sizeof(tcp_message_header), this->buf, (this->header).message_len);
         return true;
     }
-
-    void on_message(tcp_message *msg, size_t msg_len)
-    {
-        cout << "in the function on_message()" << endl;
-        /*
-        on_message_f _cb;
-        _cb = get_message_cb();
-
-        if (_cb)
-        {
-            _cb(msg, msg_len);
-        }
-        */
-    }
-
-    //ring_buffer _ring_buffer;
 };
+
+bool form_raw_tcp_message(char *buffer, size_t buff_len)
+{
+    /*
+    tcp_message_header header;
+    if (buff_len == 0)
+    {
+        // do not care buffer length
+    }
+    else if (((this->header).message_len + sizeof(tcp_message_header)) > buff_len)
+    {
+        return false;
+    }
+    memcpy(buff, &(this->header), sizeof(tcp_message_header));
+    memcpy(buff + sizeof(tcp_message_header), this->buf, (this->header).message_len);
+    */
+    return true;
+}
