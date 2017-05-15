@@ -12,5 +12,6 @@ To do:
 2. make the ring buffer multi-thread safe.
 3. while receiving a new message, first put it into ring buffer. Then another thread read the ring buffer and do the logic work.
 
+# official project plan
 this is temp idea, take the following link as official:
 https://github.com/maxcong001/translib/projects/1 
