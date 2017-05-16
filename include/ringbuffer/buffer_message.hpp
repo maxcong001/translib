@@ -4,6 +4,10 @@ struct tcp_message_header
 {
     long version;
     char magic_num[5];
+    // unique ID is for callback function searching at client side 
+    // and for server side, it is an ARG for async system, Now the server is a "client" like for async system.
+    // indicate which this reply message is for. 
+    long uniqueID;
     size_t message_len;
     char reserved;
 };
