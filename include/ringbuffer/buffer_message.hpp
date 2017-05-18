@@ -1,4 +1,5 @@
 #include "ringbuffer.hpp"
+#include "../logger/logger.h"
 #define MAX_MSG_LEN 10 * 1024
 struct tcp_message_header
 {
@@ -64,13 +65,13 @@ struct tcp_message
 
     bool get_message(ring_buffer &buffer, char *out_msg)
     {
-        cout << "in function get_message()" << endl;
+         __LOG(debug, " run here");
 
         tcp_message_header tmp_header;
         (buffer.peek(sizeof(tcp_message_header), (char *)(&tmp_header)));
         tcp_message_header *header_p = &tmp_header;
 
-        cout << "get message header, pointer is : " << (void *)header_p << endl;
+        __LOG(debug, "get message header, pointer is : " << (void *)header_p);
         if (!header_p)
         {
             return false;
@@ -78,23 +79,23 @@ struct tcp_message
 
         if (!(((tcp_message *)header_p)->is_valid()))
         {
-            cout << "get the message in the ring buffer fail, valid check fail" << endl;
+            __LOG(warn, "get the message in the ring buffer fail, valid check fail");
             return false;
         }
 
         int message_len = 0;
         message_len = (header_p->message_len) + sizeof(tcp_message_header);
 
-        cout << "int get_message() : get message with length :" << message_len << endl;
+        __LOG(debug, "int get_message() : get message with length :" << message_len);
         //length = message_len;
         if (buffer.get(message_len, out_msg))
         {
-            cout << "get message success" << endl;
+            __LOG(debug, "get message success");
             //on_message((tcp_message *)out_msg, message_len);
         }
         else
         {
-            cout << "get message fail" << endl;
+            __LOG(error, "get message fail");
             return false;
         }
         return true;

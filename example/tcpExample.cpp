@@ -19,6 +19,7 @@ using namespace std;
 //#include "ringbuffer/ringbuffer.hpp"
 #include "ringbuffer/buffer_message.hpp"
 #include "index.h"
+#include "logger/logger.h"
 
 class ExampleTcpClient : public translib::TcpClient
 {
@@ -34,12 +35,12 @@ class ExampleTcpClient : public translib::TcpClient
 
     virtual void onDisconnected()
     {
-        cout << "ExampleTcpClient::" << __FUNCTION__ << endl;
+        __LOG(debug, " run here");
     }
 
     virtual void onConnected(int error)
     {
-        cout << "ExampleTcpClient::" << __FUNCTION__ << endl;
+        __LOG(debug, " run here");
     }
 };
 
@@ -55,7 +56,7 @@ class ExampleTcpServer : public translib::TcpServer
   protected:
     virtual void onListenError()
     {
-        cout << "ExampleTcpServer::" << __FUNCTION__ << endl;
+        __LOG(debug, " run here");
     }
 
     virtual void onSessionRead(translib::TcpSession *session)
@@ -63,20 +64,20 @@ class ExampleTcpServer : public translib::TcpServer
         char *buff = _ring_buffer.peek_head_p();
         if (!buff)
         {
-            cout << "get invalid buffer ptr " << (void *)buff << endl;
+             __LOG(error, "get invalid buffer ptr " << (void *)buff);
             return;
         }
         uint32_t length = session->getInputBufferLength();
         session->readInputBuffer((uint8_t *)buff, length);
 
-        cout << "receive message with length : " << length << endl;
+        __LOG(debug, "receive message with length : " << length);
 
         while (!_ring_buffer.add(length, buff))
         {
             std::this_thread::yield();
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
-        cout << "ring buffer size " << _ring_buffer.size() << endl;
+        __LOG(debug, "ring buffer size " << _ring_buffer.size());
 
         char message_buf[MAX_MSG_LEN];
 
@@ -84,23 +85,22 @@ class ExampleTcpServer : public translib::TcpServer
         //tcp_message tmp_tcp_message;
         while (tmp_msg->get_message(_ring_buffer, (char *)tmp_msg))
         {
-            cout << "get_message() return success" << endl;
+            __LOG(debug, "get_message() return success");
             std::this_thread::yield();
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
 
-        cout << "ExampleTcpServer::" << __FUNCTION__
-             << " " << session->id() << " data:" << (void *)buff << endl;
+         __LOG(debug, "sesson id is : "<< session->id() << " data:" << (void *)buff);
     }
 
     virtual void onSessionDisconnected(translib::TcpSession *session)
     {
-        cout << "ExampleTcpServer::" << __FUNCTION__ << endl;
+        __LOG(debug, " run here");
     }
 
     virtual void onNewSession(translib::TcpSession *session)
     {
-        cout << "ExampleTcpServer::" << __FUNCTION__ << session->id() << endl;
+        __LOG(debug, " run here");
     }
 
   public:
@@ -119,7 +119,7 @@ class ExampleTcpClientManager : public translib::Loop
   protected:
     void tick()
     {
-        cout << "round " << _timer.curRound() << endl;
+        __LOG(debug, "round " << _timer.curRound());
         if (!_client.isConnected())
         {
             _client.connect("127.0.0.1", 4567);
@@ -133,8 +133,8 @@ class ExampleTcpClientManager : public translib::Loop
         tcp_message tmp_msg;
 
         tmp_msg.form_msg(tmp_str, dice_roll); //sizeof(tmp_str));
-        cout << "try to send out message with size : " << dice_roll << endl;
-        cout << "payload size is : " << tmp_msg.get_len() << endl;
+        __LOG(debug, "try to send out message with size : " << dice_roll);
+        __LOG(debug, "payload size is : " << tmp_msg.get_len());
 
         char raw_buff[MAX_MSG_LEN];
         if (tmp_msg.raw_msg(raw_buff, sizeof(raw_buff)))
@@ -142,9 +142,9 @@ class ExampleTcpClientManager : public translib::Loop
         }
         else
         {
-            cout << "get raw message fail" << endl;
+            __LOG(error, "get raw message fail");
         }
-        cout << "actually send message length is : " << tmp_msg.get_len() << endl;
+        __LOG(debug, "actually send message length is : " << tmp_msg.get_len());
         _client.send(raw_buff, tmp_msg.get_len()); //tmp_msg.get_len());
 
         if (_timer.curRound() >= 300000)
@@ -164,7 +164,7 @@ void tcpExample()
     ExampleTcpServer &tcpServer = ExampleTcpServer::instance();
     if (!tcpServer.listen("127.0.0.1", 4567))
     {
-        cout << "listen failed" << endl;
+        __LOG(error, "listen failed");
         return;
     }
 
