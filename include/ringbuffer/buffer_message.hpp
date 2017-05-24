@@ -95,7 +95,7 @@ struct tcp_message
         }
         else
         {
-            __LOG(error, "get message fail");
+            __LOG(warn, "get message fail");
             return false;
         }
         return true;
@@ -116,21 +116,30 @@ struct tcp_message
         return true;
     }
 };
-
-bool form_raw_tcp_message(char *buffer, size_t buff_len)
+// note: check if nullptr before use
+std::shared_ptr<char> form_raw_tcp_message(char *buffer, size_t buff_len)
 {
-    /*
-    tcp_message_header header;
-    if (buff_len == 0)
+    if (buff_len > MAX_MSG_LEN - sizeof(tcp_message_header))
     {
-        // do not care buffer length
+        __LOG(error, "buffer is too large!");
+        return nullptr;
     }
-    else if (((this->header).message_len + sizeof(tcp_message_header)) > buff_len)
+
+    tcp_message tmp_msg;
+
+    tmp_msg.form_msg(buffer, buff_len); 
+
+    int tmp_msg_len = tmp_msg.get_len();
+
+    std::shared_ptr<char> raw_buff(new char[tmp_msg_len], [](char* raw_buff){delete[] raw_buff;});    
+    if (tmp_msg.raw_msg(raw_buff.get()))
     {
-        return false;
     }
-    memcpy(buff, &(this->header), sizeof(tcp_message_header));
-    memcpy(buff + sizeof(tcp_message_header), this->buf, (this->header).message_len);
-    */
-    return true;
+    else
+    {
+        __LOG(error, "get raw message fail");
+        return nullptr; 
+    }
+
+    return raw_buff;
 }

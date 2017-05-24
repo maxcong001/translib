@@ -15,15 +15,16 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-	string cmd = "tcp";
+	string cmd = "tcpServer";
 	if (argc > 1) {
 		cmd = argv[1];
 	}
 
 	map<string, translib::Handler> handlers;
 	handlers["timer"] = std::bind(&timerExample);
-	handlers["tcp"] = std::bind(&tcpExample);
+	handlers["tcpServer"] = std::bind(&tcpExample);
 	handlers["http"] = std::bind(&httpExample);
+	handlers["tcpClient"] = std::bind(&tcpClientExample);
 
 	translib::Handler handler = handlers[cmd];
 	if (!handler)

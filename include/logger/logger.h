@@ -101,7 +101,7 @@ void error(const std::string &msg, const std::string &file, std::size_t line);
 #define __LOG(level, msg)
 #endif /* __LOGGING_ENABLED */
 
-std::unique_ptr<logger_iface> active_logger(new logger(logger::log_level::debug)); //nullptr;
+std::unique_ptr<logger_iface> active_logger(new logger(logger::log_level::info));//debug)); //nullptr;
 
 static const char black[] = {0x1b, '[', '1', ';', '3', '0', 'm', 0};
 static const char red[] = {0x1b, '[', '1', ';', '3', '1', 'm', 0};
