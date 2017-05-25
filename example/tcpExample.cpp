@@ -5,18 +5,18 @@
  *      Author:
  */
 
-#include "translib/loop.h"
-#include "translib/tcpServerApp.h"
-#include "translib/tcpClient.h"
+#include <chrono>
 #include <functional>
 #include <iostream>
 #include <random>
+#include <string>
 #include <thread>
 #include "index.h"
 #include "logger/logger.h"
+#include "translib/loop.h"
+#include "translib/tcpClient.h"
+#include "translib/tcpServerApp.h"
 #include "translib/timer.h"
-#include <chrono>
-#include <string>
 using namespace std;
 using namespace translib;
 
@@ -29,35 +29,42 @@ void tcp_client_t() {
   }
   _loop.start();
 
-
-
   while (1) {
     if (!_client.isConnected()) {
       _client.connect("127.0.0.1", 4567);
     }
+#if 0
+    char tmp_s[1] = {'a'};
+    _client.send(tmp_s, 1);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+#endif
 
     std::random_device rd;
-    int dice_roll = (rd() % (MAX_MSG_LEN - sizeof(tcp_message_header) - 3));
+    int dice_roll = 5000;
+
+    //(rd() % (MAX_MSG_LEN - sizeof(tcp_message_header) - 3));
 
     char tmp_str[MAX_MSG_LEN] = "test";
 
     tcp_message tmp_msg;
 
-    tmp_msg.form_msg(tmp_str, dice_roll); // sizeof(tmp_str));
+    tmp_msg.form_msg(tmp_str, dice_roll);  // sizeof(tmp_str));
     __LOG(debug, "try to send out message with size : " << dice_roll);
     __LOG(debug, "payload size is : " << tmp_msg.get_len());
 
     char raw_buff[MAX_MSG_LEN];
-    if (tmp_msg.raw_msg(raw_buff, sizeof(raw_buff))) {
+    if (tmp_msg.raw_msg(raw_buff)) {
     } else {
       __LOG(error, "get raw message fail");
     }
-    __LOG(debug, "actually send message length is : " << tmp_msg.get_len());
-    _client.send(raw_buff, tmp_msg.get_len()); // tmp_msg.get_len());
-
+    __LOG(info, "actually send message length is : " << tmp_msg.get_len());
+    _client.send(raw_buff, tmp_msg.get_len());  // tmp_msg.get_len());
+    //std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   }
 }
-
+void message_cb(std::shared_ptr<char> shared_p, size_t msg_len) {
+  __LOG(error, "get message with length " << msg_len);
+}
 void tcpExample() {
   TcpServerAPP tcpServer;
   if (!tcpServer.listen("127.0.0.1", 4567)) {
@@ -66,6 +73,10 @@ void tcpExample() {
   }
   __LOG(info, "server listen success!");
 
+  tcpServer.setMsgCallback(message_cb);
+  if (tcpServer.init()) {
+    __LOG(info, "server init success!");
+  }
   tcpServer.wait();
 }
 
