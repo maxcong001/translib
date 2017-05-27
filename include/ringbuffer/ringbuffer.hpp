@@ -32,7 +32,7 @@
 #include <vector>
 
 using namespace std;
-#define RB_SIZE 1024
+#define RB_SIZE 100
 #define RB_ELEMENT_SIZE 4096
 
 std::mutex message_mutex;
@@ -69,6 +69,7 @@ class ring_buffer {
   typedef std::shared_ptr<char> shared_char;
 
   bool get(size_t length, char *buff) {
+    std::lock_guard<std::mutex> lck(rb_mutex);
     if (length > size()) {
       // no enough space
       return false;
@@ -147,6 +148,7 @@ class ring_buffer {
 
   // when add fail, should retry
   bool add(size_t length, const char *buff) {
+    std::lock_guard<std::mutex> lck(rb_mutex);
     if ((start_p + length) < buffer_end) {
       if (start_p < end_p) {
         if ((start_p + length) > end_p) {
@@ -204,6 +206,8 @@ class ring_buffer {
   char *end_p;
   char *buffer_start;  // this is the start of the buffer
   char *buffer_end;
+
+  std::mutex rb_mutex;
 };
 
 bool ring_buffer::init() {

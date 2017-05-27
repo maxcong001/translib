@@ -40,7 +40,7 @@ void tcp_client_t() {
 #endif
 
     std::random_device rd;
-    int dice_roll = 5000;
+    int dice_roll = 30; 
 
     //(rd() % (MAX_MSG_LEN - sizeof(tcp_message_header) - 3));
 
@@ -63,7 +63,7 @@ void tcp_client_t() {
   }
 }
 void message_cb(std::shared_ptr<char> shared_p, size_t msg_len) {
-  __LOG(error, "get message with length " << msg_len);
+  __LOG(error, "in the message_cb get message with length " << msg_len);
 }
 void tcpExample() {
   TcpServerAPP tcpServer;
