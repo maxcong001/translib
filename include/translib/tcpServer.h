@@ -37,6 +37,10 @@ public:
 	{
 		return *_master;
 	}
+	translib::TcpServerDispatcher * getDispatcher()
+	{
+		return _master;
+	}
 
 	inline translib::TcpSessionFactory * sessionFactory() const
 	{

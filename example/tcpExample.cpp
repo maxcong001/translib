@@ -28,6 +28,8 @@ void tcp_client_t() {
     return;
   }
   _loop.start();
+  char tmp_str[MAX_MSG_LEN] = "test";
+  char raw_buff[MAX_MSG_LEN];
 
   while (1) {
     if (!_client.isConnected()) {
@@ -40,11 +42,9 @@ void tcp_client_t() {
 #endif
 
     std::random_device rd;
-    int dice_roll = 30; 
+    int dice_roll = (rd() % (MAX_MSG_LEN - sizeof(tcp_message_header) - 3));
 
-    //(rd() % (MAX_MSG_LEN - sizeof(tcp_message_header) - 3));
-
-    char tmp_str[MAX_MSG_LEN] = "test";
+    
 
     tcp_message tmp_msg;
 
@@ -52,18 +52,20 @@ void tcp_client_t() {
     __LOG(debug, "try to send out message with size : " << dice_roll);
     __LOG(debug, "payload size is : " << tmp_msg.get_len());
 
-    char raw_buff[MAX_MSG_LEN];
+    
     if (tmp_msg.raw_msg(raw_buff)) {
     } else {
       __LOG(error, "get raw message fail");
     }
     __LOG(info, "actually send message length is : " << tmp_msg.get_len());
     _client.send(raw_buff, tmp_msg.get_len());  // tmp_msg.get_len());
-    //std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
   }
 }
-void message_cb(std::shared_ptr<char> shared_p, size_t msg_len) {
-  __LOG(error, "in the message_cb get message with length " << msg_len);
+void message_cb(std::shared_ptr<char> shared_p, size_t msg_len, translib::TcpSessionPtr cb_session) {
+  __LOG(info, "in the message_cb get message with length " << msg_len);
+  cb_session->send("OK", 2);
+
 }
 void tcpExample() {
   TcpServerAPP tcpServer;

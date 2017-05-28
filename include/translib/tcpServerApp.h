@@ -7,7 +7,7 @@
 
 namespace translib {
 
-typedef std::function<void(std::shared_ptr<char>, size_t)> MSG_FUN;
+typedef std::function<void(std::shared_ptr<char>, size_t, translib::TcpSessionPtr)> MSG_FUN;
 
 class TcpServerAPP : public translib::TcpServer {
  public:
@@ -37,12 +37,12 @@ class TcpServerAPP : public translib::TcpServer {
     __LOG(debug, "receive message with length : " << length);
 
     while (!(_ring_buffer->add(length, buff))) {
-      __LOG(info, "add to ring buffer fail");
+      __LOG(error, "add to ring buffer fail");
       std::this_thread::yield();
       // std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
     mapCond.notify_all();
-    __LOG(info, "now ring buffer size " << _ring_buffer->size());
+    __LOG(error, "now ring buffer size " << _ring_buffer->size());
 
     __LOG(debug, "sesson id is : " << session->id()
                                    << " data:" << (void *)buff);
@@ -74,6 +74,7 @@ class TcpServerAPP : public translib::TcpServer {
 
       for (auto i : ringBufferMap) {
         uint64_t tmp_sessionID = i.first;
+        
         ring_buffer *_ring_buffer = i.second;
         // to do release lock here
         int msg_len;
@@ -91,7 +92,7 @@ class TcpServerAPP : public translib::TcpServer {
                                      [](char *p) { delete[] p; });
             _ring_buffer->get(msg_len, sp.get());
             if (msg_callback_func) {
-              msg_callback_func(sp, msg_len);
+              msg_callback_func(sp, msg_len, (getDispatcher()->getSession(tmp_sessionID)));
             } else {
               __LOG(warn, "no callback function is called!");
             }
