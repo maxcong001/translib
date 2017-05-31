@@ -19,9 +19,11 @@ class TcpServerAPP : public translib::TcpServer {
       __LOG(error, "session pointer is not valid");
     }
     uint64_t tmp_sessionID = session->id();
+    __LOG(error, "session ID is : " << (session->id()));
     // to do add lock here
     if (ringBufferMap.find(tmp_sessionID) == ringBufferMap.end()) {
-      // if no ring buffer, add it
+      // if no ring buffer, add it 
+      __LOG(info, "do not find session in the ringbuffer map, session ID is : "<<tmp_sessionID);
       ringBufferMap[tmp_sessionID] = new ring_buffer();
     }
     ring_buffer *_ring_buffer = ringBufferMap[tmp_sessionID];
@@ -42,7 +44,7 @@ class TcpServerAPP : public translib::TcpServer {
       // std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
     mapCond.notify_all();
-    __LOG(info, "now ring buffer size " << _ring_buffer->size());
+    __LOG(error, "now ring buffer size " << _ring_buffer->size());
 
     __LOG(debug, "sesson id is : " << session->id()
                                    << " data:" << (void *)buff);
@@ -87,8 +89,8 @@ class TcpServerAPP : public translib::TcpServer {
             break;
           }
           if (msg_p->is_valid()) {
-            std::shared_ptr<char> sp(new char[msg_len],
-                                     [](char *p) { delete[] p; });
+            std::shared_ptr<char> sp(new char[msg_len], [](char *p) { __LOG(error, "delete message");delete[] p;
+            });
             _ring_buffer->get(msg_len, sp.get());
             if (msg_callback_func) {
               msg_callback_func(sp, msg_len);

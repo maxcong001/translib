@@ -28,7 +28,7 @@ void tcp_client_t() {
     return;
   }
   _loop.start();
-
+  int i = 0;
   while (1) {
     if (!_client.isConnected()) {
       _client.connect("127.0.0.1", 4567);
@@ -40,9 +40,7 @@ void tcp_client_t() {
 #endif
 
     std::random_device rd;
-    int dice_roll = 30; 
-
-    //(rd() % (MAX_MSG_LEN - sizeof(tcp_message_header) - 3));
+    int dice_roll = (rd() % (MAX_MSG_LEN - sizeof(tcp_message_header) - 3));
 
     char tmp_str[MAX_MSG_LEN] = "test";
 
@@ -59,7 +57,13 @@ void tcp_client_t() {
     }
     __LOG(info, "actually send message length is : " << tmp_msg.get_len());
     _client.send(raw_buff, tmp_msg.get_len());  // tmp_msg.get_len());
-    //std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    // std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    i++;
+#if 0
+    if (i > 1000) {
+      break;
+    }
+#endif
   }
 }
 void message_cb(std::shared_ptr<char> shared_p, size_t msg_len) {
