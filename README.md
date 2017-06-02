@@ -4,6 +4,8 @@
 # road map
 now this project is in developing.
 
+# this branch stop develop, switch to 0mq instead
+
 To do:
 ## client side
 1. client side with a worker queue.
