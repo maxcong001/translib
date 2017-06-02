@@ -57,7 +57,7 @@ void tcp_client_t() {
     }
     __LOG(info, "actually send message length is : " << tmp_msg.get_len());
     _client.send(raw_buff, tmp_msg.get_len());  // tmp_msg.get_len());
-    // std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     i++;
 #if 0
     if (i > 1000) {
@@ -86,6 +86,7 @@ void tcpExample() {
 
 void tcpClientExample() {
   // std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
   std::thread client_thread(tcp_client_t);
   std::thread client_thread1(tcp_client_t);
   std::thread client_thread2(tcp_client_t);
@@ -100,6 +101,8 @@ void tcpClientExample() {
   client_thread4.join();
   client_thread5.join();
   client_thread6.join();
+  
+ //  std::thread client_thread(tcp_client_t);  client_thread.join();
 
   // tcp_client_t();
 }
