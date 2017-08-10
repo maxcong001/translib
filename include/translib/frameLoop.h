@@ -16,7 +16,7 @@ namespace translib
 class Timer;
 
 /**
- * @brief event loop with frame timer
+ * @brief event loop with frame ttimer
  * @details as there is infinite timer, so it exist in the registerd event forever. default frame timer is 10ms
  */
 class FrameLoop : public translib::Loop {

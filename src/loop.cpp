@@ -6,7 +6,6 @@
  */
 
 #include "translib/loop.h"
-#include "logger/logger.h"
 
 thread_local translib::Loop * curThreadLoop;
 
@@ -113,8 +112,7 @@ void Loop::_run()
 	_status = StatusRunning;
 	curThreadLoop = this;
 	onBeforeLoop();
-	event_base_dispatch(_base);	
-//	event_base_loop(_base, 0);
+	event_base_loop(_base, 0);
 	onAfterLoop();
 	curThreadLoop = NULL;
 	_status = StatusFinished;
@@ -131,7 +129,6 @@ void Loop::onBeforeLoop()
 
 void Loop::onAfterLoop()
 {
-
 }
 
 void Loop::onAfterStop()

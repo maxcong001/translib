@@ -10,11 +10,8 @@
 
 void timerExample();
 
-void tcpSeverExample();
-void tcpClientExample();
+void tcpExample();
 
 void httpExample();
-
-
 
 #endif /* EXAMPLE_INDEX_H_ */

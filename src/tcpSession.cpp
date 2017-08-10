@@ -12,16 +12,15 @@
 namespace translib
 {
 
-TcpSession::TcpSession():
-		_dispatcher(NULL),
-		_id(0)
+TcpSession::TcpSession() : _dispatcher(NULL),
+						   _id(0)
 {
 }
 
 bool TcpSession::attach(
-		translib::TcpServerDispatcher * dispatcher,
-		translib::SessionId id,
-		translib::SocketFd sock)
+	translib::TcpServerDispatcher *dispatcher,
+	translib::SessionId id,
+	translib::SocketFd sock)
 {
 	_id = id;
 	_dispatcher = dispatcher;
@@ -32,7 +31,7 @@ bool TcpSession::attach(
 	}
 
 	_bev = bufferevent_socket_new(_dispatcher->ev(),
-			sock, BEV_OPT_THREADSAFE | BEV_OPT_DEFER_CALLBACKS);
+								  sock, BEV_OPT_THREADSAFE | BEV_OPT_DEFER_CALLBACKS);
 	if (NULL == _bev)
 	{
 		return false;
@@ -45,6 +44,7 @@ bool TcpSession::attach(
 		_bev = NULL;
 		return false;
 	}
+	_dispatcher->server()->onNewSession(this);
 
 	return true;
 }

@@ -28,9 +28,9 @@
 
 #include <memory>
 #include <mutex>
-#include <string>       // std::string
-#include <iostream>     // std::cout
-#include <sstream>      // std::ostringstream
+#include <string>   // std::string
+#include <iostream> // std::cout
+#include <sstream>  // std::ostringstream
 
 typedef std::basic_ostream<char> tostream;
 typedef std::basic_istream<char> tistream;
@@ -91,18 +91,19 @@ void error(const std::string &msg, const std::string &file, std::size_t line);
 #define __LOGGING_ENABLED
 
 #ifdef __LOGGING_ENABLED
-#define __LOG(level, msg) \
-{                       \
-    tostringstream  var;\
-    var << "[fuction:" << __func__ << "] " <<msg;     \
-    level(var.str(), __FILE__, __LINE__); \
+#define __LOG(level, msg)                              \
+    \
+{                                               \
+        tostringstream var;                            \
+        var << "[fuction:" << __func__ << "] " << msg; \
+        level(var.str(), __FILE__, __LINE__);          \
+    \
 }
 #else
 #define __LOG(level, msg)
 #endif /* __LOGGING_ENABLED */
 
-std::unique_ptr<logger_iface> active_logger(
-    new logger(logger::log_level::error));  // info));//debug)); //nullptr;
+std::unique_ptr<logger_iface> active_logger(new logger(logger::log_level::debug)); //nullptr;
 
 static const char black[] = {0x1b, '[', '1', ';', '3', '0', 'm', 0};
 static const char red[] = {0x1b, '[', '1', ';', '3', '1', 'm', 0};

@@ -1,8 +1,8 @@
 //============================================================================
 // Name        : test.cpp
-// Author      : 
+// Author      :
 // Version     :
-// Copyright   :  
+// Copyright   :
 // Description : Hello World in C++, Ansi-style
 //============================================================================
 #include <iostream>
@@ -15,16 +15,16 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-	string cmd = "tcpServer";
-	if (argc > 1) {
+	string cmd = "tcp";
+	if (argc > 1)
+	{
 		cmd = argv[1];
 	}
 
 	map<string, translib::Handler> handlers;
 	handlers["timer"] = std::bind(&timerExample);
-	handlers["tcpServer"] = std::bind(&tcpExample);
+	handlers["tcp"] = std::bind(&tcpExample);
 	handlers["http"] = std::bind(&httpExample);
-	handlers["tcpClient"] = std::bind(&tcpClientExample);
 
 	translib::Handler handler = handlers[cmd];
 	if (!handler)

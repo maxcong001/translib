@@ -15,13 +15,12 @@ using namespace std;
 
 class ExampleTimerServer
 {
-public:
-	ExampleTimerServer():
-		_timer(_loop)
+  public:
+	ExampleTimerServer() : _timer(_loop)
 	{
 	}
 
-	static ExampleTimerServer & instance()
+	static ExampleTimerServer &instance()
 	{
 		static ExampleTimerServer ins;
 		return ins;
@@ -46,7 +45,7 @@ public:
 		_loop.stop();
 	}
 
-private:
+  private:
 	void tick()
 	{
 		uint64_t round = _timer.curRound();
@@ -57,7 +56,7 @@ private:
 		}
 	}
 
-private:
+  private:
 	translib::Loop _loop;
 	translib::Timer _timer;
 };

@@ -11,7 +11,6 @@
 void timerExample();
 
 void tcpExample();
-void tcpClientExample();
 
 void httpExample();
 

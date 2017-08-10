@@ -14,14 +14,14 @@ using namespace std;
 
 class ExampleHttpServer : public translib::HttpServer
 {
-public:
+  public:
 	void reg()
 	{
 		regHandler("/", std::bind(&ExampleHttpServer::doMainRequest, this, placeholders::_1));
 		regHandler("/test", std::bind(&ExampleHttpServer::doTestRequest, this, placeholders::_1));
 	}
 
-private:
+  private:
 	void doMainRequest(translib::HttpRequest *request)
 	{
 		request->setBody("main page");
@@ -31,7 +31,6 @@ private:
 	{
 		request->setBody("test page");
 	}
-
 };
 
 void httpExample()
