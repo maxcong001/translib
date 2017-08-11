@@ -13,5 +13,6 @@ void timerExample();
 void tcpExample();
 
 void httpExample();
+void timerManagerExample();
 
 #endif /* EXAMPLE_INDEX_H_ */

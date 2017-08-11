@@ -15,7 +15,7 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-	string cmd = "tcp";
+	string cmd = "TM";
 	if (argc > 1)
 	{
 		cmd = argv[1];
@@ -25,6 +25,7 @@ int main(int argc, char *argv[])
 	handlers["timer"] = std::bind(&timerExample);
 	handlers["tcp"] = std::bind(&tcpExample);
 	handlers["http"] = std::bind(&httpExample);
+	handlers["TM"] = std::bind(&timerManagerExample);
 
 	translib::Handler handler = handlers[cmd];
 	if (!handler)

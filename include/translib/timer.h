@@ -9,6 +9,7 @@
 #define EC_TIMER_H_
 
 #include "loop.h"
+#include <memory>
 
 namespace translib
 {
@@ -17,11 +18,12 @@ class Loop;
 
 class Timer
 {
-public:
+  public:
 	/** @brief callback fuction */
-	typedef std::function<void ()> Handler;
+	typedef std::function<void()> Handler;
+	typedef std::shared_ptr<Timer> ptr_p;
 
-public:
+  public:
 	Timer(const translib::Loop &loop);
 	virtual ~Timer();
 
@@ -55,10 +57,10 @@ public:
 	 * @param handler callback function
 	 */
 	bool startAfter(
-			uint32_t after,
-			uint32_t interval,
-			uint64_t round,
-			translib::Timer::Handler handler);
+		uint32_t after,
+		uint32_t interval,
+		uint64_t round,
+		translib::Timer::Handler handler);
 
 	/** get timer interval */
 	inline uint32_t interval() const
@@ -83,17 +85,21 @@ public:
 	{
 		return _curRound >= _round;
 	}
+	void stop()
+	{
+		reset();
+	}
 
-private:
+  private:
 	void reset();
 	static void eventHandler(evutil_socket_t fd, short events, void *ctx);
 
-private:
+  private:
 	const Loop &_loop;
 	struct event *_event;
 	uint32_t _interval; //ms
-	uint64_t _round; 
-	uint64_t _curRound; 
+	uint64_t _round;
+	uint64_t _curRound;
 	translib::Timer::Handler _handler;
 };
 

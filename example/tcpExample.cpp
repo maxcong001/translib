@@ -8,6 +8,7 @@
 #include <iostream>
 #include <functional>
 #include <thread>
+#include <unistd.h>
 using namespace std;
 
 #include "translib/loop.h"
@@ -59,12 +60,13 @@ class ExampleTcpServer : public translib::TcpServer
     {
 
         uint32_t length = session->getInputBufferLength();
-        std::string buff;
-        buff.reserve(length);
 
-        session->readInputBuffer((uint8_t *)(buff.c_str()), length);
+        uint8_t buff[1024];
 
-        __LOG(debug, "receive message with length : " << length << " buffer is " << buff);
+        session->readInputBuffer(buff, length);
+        std::string str((char *)buff, length);
+
+        __LOG(debug, "receive message with length : " << length << " data is " << str);
 
         __LOG(debug, "sesson id is : " << session->id());
     }
@@ -93,16 +95,23 @@ class ExampleTcpClientManager : public translib::Loop
     void tick()
     {
         __LOG(debug, "round " << _timer.curRound());
+
         if (!_client.isConnected())
         {
+            //__LOG(debug, "not connected, round " << _timer.curRound());
             _client.connect("127.0.0.1", 4567);
+            sleep(2);
+        }
+        if (!_client.isConnected())
+        {
+            __LOG(debug, "not connected, round " << _timer.curRound());
         }
 
         std::string test("test");
 
         _client.send(test.c_str(), test.size()); //tmp_msg.get_len());
 
-        if (_timer.curRound() >= 30)
+        if (_timer.curRound() >= 300)
         {
             _client.close(false);
             ExampleTcpServer::instance().stop();
