@@ -39,7 +39,10 @@ Timer::ptr_p TimerManager::getTimer(int *timerID)
 	int tid = getUniqueID();
 	Timer::ptr_p tmp_ptr(new Timer(_loop));
 	t_map.emplace(tid, tmp_ptr);
-	*timerID = tid;
+	if (timerID)
+	{
+		*timerID = tid;
+	}
 	return tmp_ptr;
 }
 // you can call timer.stop or pass in the ID and we will kill the timer
