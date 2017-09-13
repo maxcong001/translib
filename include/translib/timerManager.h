@@ -39,6 +39,11 @@ class TimerManager
 	bool init();
 	Timer::ptr_p getTimer(int *timerID = NULL);
 	bool killTimer(int timerID);
+	static TimerManager* instance()
+	{
+		static TimerManager* ins = new TimerManager();
+		return ins;
+	}
 
   protected:
   private:
