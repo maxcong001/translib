@@ -67,6 +67,11 @@ class TcpClientTPKT : public translib::TcpClient
         do
         {
             uint32_t length = this->getInputBufferLength();
+            if (length < 1)
+            {
+                __LOG(debug, "[TcpClientTPKT] read " << length << "message, it is less than 1 byte!");
+                break;
+            }
             const uint8_t *buf = this->viewInputBuffer(TPKT1_LENGTH);
             if (buf[0] != TPKT_VERSION1_LOW_BYTE)
             {
