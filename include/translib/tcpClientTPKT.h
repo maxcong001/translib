@@ -30,10 +30,10 @@
 
 namespace translib
 {
-class TcpClientWithTPKT : public translib::TcpClient
+class TcpClientTPKT : public translib::TcpClient
 {
   public:
-    TcpClientWithTPKT(const translib::Loop &loop) : translib::TcpClient(loop)
+    TcpClientTPKT(const translib::Loop &loop) : translib::TcpClient(loop)
     {
     }
     bool connect_with_IP(std::string IP, std::string Port)
@@ -55,13 +55,13 @@ class TcpClientWithTPKT : public translib::TcpClient
         bool ret = send(tpkt_header, sizeof(tpkt_header));
         if (!ret)
         {
-            __LOG(error, "[TcpClientWithTPKT] send TPKT header fail!");
+            __LOG(error, "[TcpClientTPKT] send TPKT header fail!");
             return false;
         }
         return send(data, length);
     }
 
-    protected:
+  protected:
     virtual void onRead()
     {
         do
@@ -70,7 +70,7 @@ class TcpClientWithTPKT : public translib::TcpClient
             const uint8_t *buf = this->viewInputBuffer(TPKT1_LENGTH);
             if (buf[0] != TPKT_VERSION1_LOW_BYTE)
             {
-                __LOG(error, "[TcpClientWithTPKT] error!!! TPKT magic number is lost!!");
+                __LOG(error, "[TcpClientTPKT] error!!! TPKT magic number is lost!!");
                 // read one byte and try again
                 uint8_t tmp_buf;
                 this->readInputBuffer(&tmp_buf, 1);
@@ -80,7 +80,6 @@ class TcpClientWithTPKT : public translib::TcpClient
             unsigned int packet_length = ((*(buf + 1) & 0xff) << 16) |
                                          ((*(buf + 2) & 0xff) << 8) |
                                          (*(buf + 3) & 0xff);
-
             //length = packet_length - TPKT1_LENGTH;
             if (packet_length > length)
             {
@@ -101,17 +100,17 @@ class TcpClientWithTPKT : public translib::TcpClient
     void onRead(uint8_t *msg, uint32_t len)
     {
         // please do not do too much work here!
-        __LOG(debug, "[TcpClientWithTPKT] receive " << len << " byte message");
+        __LOG(debug, "[TcpClientTPKT] receive " << len << " byte message");
     }
 
     virtual void onDisconnected()
     {
-        __LOG(error, "[TcpClientWithTPKT] disconnected");
+        __LOG(error, "[TcpClientTPKT] disconnected");
     }
 
     virtual void onConnected(int errorr)
     {
-        __LOG(debug, "[TcpClientWithTPKT] connected successfully");
+        __LOG(debug, "[TcpClientTPKT] connected successfully");
     }
 
   private:

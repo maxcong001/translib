@@ -136,7 +136,7 @@ void TKPT_example()
         __LOG(error, " server listen return fail!");
     }
     translib::Loop loop;
-    translib::TcpClientWithTPKT client(loop);
+    translib::TcpClientTPKT client(loop);
     if (!client.connect("127.0.0.1", 2565))
     {
         __LOG(error, "connect to  server return fail!");
@@ -152,7 +152,6 @@ void TKPT_example()
         client.sendWithTPKT(test, sizeof(test));
     });
     getchar();
-
 }
 
 void tcpExample()
