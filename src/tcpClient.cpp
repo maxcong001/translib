@@ -5,16 +5,15 @@
  *      Author: 
  */
 
-
 #include "translib/tcpClient.h"
-
+#include <netinet/tcp.h>
 namespace translib
 {
 
-TcpClient::TcpClient(const translib::Loop &loop) :
-		_loop(loop),
-		_isConnected(false)
-{}
+TcpClient::TcpClient(const translib::Loop &loop) : _loop(loop),
+												   _isConnected(false)
+{
+}
 
 bool TcpClient::connect(const char *ip, uint16_t port)
 {
@@ -22,13 +21,18 @@ bool TcpClient::connect(const char *ip, uint16_t port)
 	{
 		return false;
 	}
-
 	_bev = bufferevent_socket_new(_loop.ev(), SOCKET_FD_INVALID,
-			BEV_OPT_CLOSE_ON_FREE | BEV_OPT_THREADSAFE | BEV_OPT_DEFER_CALLBACKS);
-	if(NULL == _bev)
+								  BEV_OPT_CLOSE_ON_FREE | BEV_OPT_THREADSAFE | BEV_OPT_DEFER_CALLBACKS);
+	if (NULL == _bev)
 	{
 		return false;
 	}
+#ifdef TRANS_TCP_NO_DELAY
+	evutil_socket_t fd = bufferevent_getfd(_bev);
+	int enable = 1;
+	setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, (void *)&enable, sizeof(enable));
+// IPPROTO_TCP SOL_SOCKET
+#endif
 
 	bufferevent_setcb(_bev, readCallback, writeCallback, eventCallback, this);
 	if (-1 == bufferevent_enable(_bev, EV_READ | EV_WRITE))
@@ -37,7 +41,6 @@ bool TcpClient::connect(const char *ip, uint16_t port)
 		_bev = NULL;
 		return false;
 	}
-
 
 	struct sockaddr_in serverAddr;
 	memset(&serverAddr, 0, sizeof(serverAddr));
@@ -101,6 +104,5 @@ void TcpClient::eventCallback(struct bufferevent *bev, short events, void *ctx)
 	TcpClient *socket = (TcpClient *)ctx;
 	socket->handleEvent(events);
 }
-
 
 } /* namespace translib */

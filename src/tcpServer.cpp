@@ -6,16 +6,15 @@
  */
 
 #include "translib/tcpServer.h"
-
+#include <netinet/tcp.h>
 namespace translib
 {
 
 translib::SessionId TcpServer::s_sessionIdGenerator = 0;
 
-TcpServer::TcpServer(translib::TcpSessionFactory * sessionFactory, uint16_t threads) :
-		_eventListener(NULL),
-		_master(NULL),
-		_sessionFactory(sessionFactory)
+TcpServer::TcpServer(translib::TcpSessionFactory *sessionFactory, uint16_t threads) : _eventListener(NULL),
+																					  _master(NULL),
+																					  _sessionFactory(sessionFactory)
 {
 	if (NULL == _sessionFactory)
 	{
@@ -64,14 +63,20 @@ bool TcpServer::listen(const char *ip, uint16_t port)
 	serverAddr.sin_port = htons(port);
 
 	_eventListener = evconnlistener_new_bind(_master->ev(),
-			listenEventCallback, this,
-			LEV_OPT_CLOSE_ON_FREE | LEV_OPT_REUSEABLE | LEV_OPT_THREADSAFE, -1,
-			(struct sockaddr *)&serverAddr, sizeof(serverAddr));
+											 listenEventCallback, this,
+											 LEV_OPT_CLOSE_ON_FREE | LEV_OPT_REUSEABLE | LEV_OPT_THREADSAFE, -1,
+											 (struct sockaddr *)&serverAddr, sizeof(serverAddr));
 
 	if (NULL == _eventListener)
 	{
 		return false;
 	}
+#ifdef TRANS_TCP_NO_DELAY
+	evutil_socket_t fd = evconnlistener_get_fd(_eventListener);
+	int enable = 1;
+	setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, (void *)&enable, sizeof(enable));
+// IPPROTO_TCP SOL_SOCKET
+#endif
 
 	evutil_make_socket_nonblocking(evconnlistener_get_fd(_eventListener));
 	evconnlistener_set_error_cb(_eventListener, listenErrorCallback);
@@ -109,9 +114,9 @@ void TcpServer::wait()
 	}
 }
 
-translib::TcpServerDispatcher * TcpServer::getSessionDispatcher(translib::SessionId id)
+translib::TcpServerDispatcher *TcpServer::getSessionDispatcher(translib::SessionId id)
 {
-	return _slavers.empty() ? _master : _slavers[id%_slavers.size()];
+	return _slavers.empty() ? _master : _slavers[id % _slavers.size()];
 }
 
 void TcpServer::listenEventCallback(
@@ -137,7 +142,4 @@ void TcpServer::listenErrorCallback(struct evconnlistener *listener, void *ctx)
 	}
 }
 
-
 } /* namespace translib */
-
-
