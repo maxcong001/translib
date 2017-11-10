@@ -39,6 +39,11 @@ public:
     do
     {
       uint32_t length = session->getInputBufferLength();
+      if (length < 1)
+      {
+        __LOG(debug, "[TcpServerTPKT] read " << length << "message, it is less than 1 byte!");
+        break;
+      }
       const uint8_t *buf = session->viewInputBuffer(TPKT1_LENGTH);
       if (!buf)
       {
