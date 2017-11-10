@@ -1,0 +1,26 @@
+{
+    "remotePath": "/home/mcong/feature/translib",
+    "host": "135.251.166.251",
+    "username": "mcong",
+    "password": "mcong",
+    "port": 22,
+    "secure": false,
+    "protocol": "sftp",
+    "uploadOnSave": false,
+    "passive": false,
+    "debug": false,
+    "privateKeyPath": null,
+    "passphrase": null,
+    "ignore": [
+        "\\.vscode",
+        "\\.git",
+        "\\.DS_Store",
+        "\\lib",
+        "\\build"
+    ],
+    "generatedFiles": {
+        "uploadOnSave": false,
+        "extensionsToInclude": [],
+        "path": ""
+    }
+}

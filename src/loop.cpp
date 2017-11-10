@@ -1,13 +1,31 @@
 /*
- * loop.cpp
+ * Copyright (c) 2016-20017 Max Cong <savagecm@qq.com>
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. The name of the author may not be used to endorse or promote products
+ *    derived from this software without specific prior written permission.
  *
- *  Created on: 2015年5月30日
- *      Author: 
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "translib/loop.h"
 
-thread_local translib::Loop * curThreadLoop;
+thread_local translib::Loop *curThreadLoop;
 
 namespace translib
 {
@@ -15,11 +33,10 @@ std::mutex Loop::_sMutex;
 std::map<uint32_t, translib::Loop *> Loop::_sLoops;
 uint32_t Loop::_sIdGenerater = 0;
 
-Loop::Loop() :
-	_id(0),
-	_base(NULL),
-	_thread(NULL),
-	_status(StatusInit)
+Loop::Loop() : _id(0),
+			   _base(NULL),
+			   _thread(NULL),
+			   _status(StatusInit)
 {
 	_sMutex.lock();
 	_sIdGenerater++;
@@ -33,7 +50,7 @@ Loop::Loop() :
 		evthread_use_windows_threads();
 #else
 		evthread_use_pthreads();
-#endif//PLATFORM_WINDOWS
+#endif //PLATFORM_WINDOWS
 	}
 
 	_sLoops[_id] = this;
@@ -62,18 +79,20 @@ Loop::~Loop()
 	{
 #ifdef PLATFORM_WINDOWS
 		WSACleanup();
-#endif//PLATFORM_WINDOWS
+#endif //PLATFORM_WINDOWS
 	}
 	_sMutex.unlock();
 }
 
 bool Loop::start(bool newThread)
 {
-	if (_status != StatusInit) {
+	if (_status != StatusInit)
+	{
 		return false;
 	}
 
-	if (!onBeforeStart()) {
+	if (!onBeforeStart())
+	{
 		return false;
 	}
 
@@ -99,7 +118,8 @@ void Loop::wait()
 
 void Loop::stop(bool waiting)
 {
-	if (StatusFinished == _status) {
+	if (StatusFinished == _status)
+	{
 		return;
 	}
 
@@ -135,12 +155,12 @@ void Loop::onAfterStop()
 {
 }
 
-Loop * Loop::curLoop()
+Loop *Loop::curLoop()
 {
 	return curThreadLoop;
 }
 
-Loop * Loop::get(uint32_t id)
+Loop *Loop::get(uint32_t id)
 {
 	std::unique_lock<std::mutex> lock(_sMutex);
 	auto iter = _sLoops.find(id);

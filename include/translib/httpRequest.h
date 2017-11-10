@@ -1,12 +1,29 @@
 /*
- * httpRequest.h
+ * Copyright (c) 2016-20017 Max Cong <savagecm@qq.com>
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. The name of the author may not be used to endorse or promote products
+ *    derived from this software without specific prior written permission.
  *
- *  Created on: 2015年7月7日
- *      Author: 
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_EC_HTTPREQUEST_H_
-#define INCLUDE_EC_HTTPREQUEST_H_
+#pragma once
 
 #include <evhttp.h>
 
@@ -16,27 +33,25 @@ namespace translib
 class HttpRequest
 {
 	friend class HttpServer;
-public:
-	HttpRequest(evhttp_request * req);
+
+  public:
+	HttpRequest(evhttp_request *req);
 	~HttpRequest();
 
-	const char * getUri();
-	const char * getPath();
-	const char * getHost();
+	const char *getUri();
+	const char *getPath();
+	const char *getHost();
 	uint16_t getPort();
-	evhttp_cmd_type getCommand(); 		
-	const char * findHeaders(const char * key);
+	evhttp_cmd_type getCommand();
+	const char *findHeaders(const char *key);
 
-	bool setHeader(const char * key, const char * value);
-	bool setBody(const char * content);
-	bool setChunk(const char * content);
+	bool setHeader(const char *key, const char *value);
+	bool setBody(const char *content);
+	bool setChunk(const char *content);
 
-private:
-	evhttp_request * _req;
-	struct evbuffer * _buffer;
+  private:
+	evhttp_request *_req;
+	struct evbuffer *_buffer;
 };
 
 } /* namespace translib */
-
-
-#endif /* INCLUDE_EC_HTTPREQUEST_H_ */

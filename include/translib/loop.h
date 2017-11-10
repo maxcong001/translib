@@ -1,13 +1,29 @@
 /*
- * loop.h
+ * Copyright (c) 2016-20017 Max Cong <savagecm@qq.com>
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. The name of the author may not be used to endorse or promote products
+ *    derived from this software without specific prior written permission.
  *
- *  Created on: 2015年5月30日
- *      Author: 
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_EC_LOOP_H_
-#define INCLUDE_EC_LOOP_H_
-
+#pragma once
 
 #include <map>
 #include "translib/define.h"
@@ -22,8 +38,7 @@ namespace translib
  */
 class Loop
 {
-public:
-
+  public:
 	static const int StatusInit = 0;
 
 	static const int StatusRunning = 2;
@@ -34,17 +49,16 @@ public:
 	virtual ~Loop();
 
 	/** convert to event_base * pointer*/
-	inline operator event_base * () const
+	inline operator event_base *() const
 	{
 		return _base;
 	};
 
 	/** @brief get event_base * pointer*/
-	inline event_base * ev() const
+	inline event_base *ev() const
 	{
 		return _base;
 	}
-
 
 	inline uint32_t id() const
 	{
@@ -70,7 +84,6 @@ public:
 	 */
 	bool start(bool newThread = true);
 
-
 	void wait();
 
 	/** if run with new thread, will stop the new thread
@@ -78,8 +91,7 @@ public:
 	 */
 	void stop(bool waiting = true);
 
-protected:
-
+  protected:
 	virtual bool onBeforeStart();
 
 	virtual void onBeforeLoop();
@@ -88,10 +100,10 @@ protected:
 
 	virtual void onAfterStop();
 
-private:
+  private:
 	void _run();
 
-private:
+  private:
 	uint32_t _id;
 	event_base *_base;
 
@@ -99,19 +111,16 @@ private:
 
 	std::atomic<int> _status;
 
-public:
+  public:
+	static Loop *curLoop();
 
-	static Loop * curLoop();
+	// ID to loop
+	static Loop *get(uint32_t id);
 
-    // ID to loop
-	static Loop * get(uint32_t id);
-
-private:
+  private:
 	static std::mutex _sMutex;
 	static std::map<uint32_t, translib::Loop *> _sLoops;
 	static uint32_t _sIdGenerater;
 };
 
 } /* namespace translib */
-
-#endif /* INCLUDE_EC_LOOP_H_ */

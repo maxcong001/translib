@@ -1,20 +1,37 @@
 /*
- * tcpClient.cpp
+ * Copyright (c) 2016-20017 Max Cong <savagecm@qq.com>
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. The name of the author may not be used to endorse or promote products
+ *    derived from this software without specific prior written permission.
  *
- *  Created on: 2015年6月25日
- *      Author: 
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 #include "translib/tcpClient.h"
-
+#include <netinet/tcp.h>
 namespace translib
 {
 
-TcpClient::TcpClient(const translib::Loop &loop) :
-		_loop(loop),
-		_isConnected(false)
-{}
+TcpClient::TcpClient(const translib::Loop &loop) : _loop(loop),
+												   _isConnected(false)
+{
+}
 
 bool TcpClient::connect(const char *ip, uint16_t port)
 {
@@ -22,13 +39,18 @@ bool TcpClient::connect(const char *ip, uint16_t port)
 	{
 		return false;
 	}
-
 	_bev = bufferevent_socket_new(_loop.ev(), SOCKET_FD_INVALID,
-			BEV_OPT_CLOSE_ON_FREE | BEV_OPT_THREADSAFE | BEV_OPT_DEFER_CALLBACKS);
-	if(NULL == _bev)
+								  BEV_OPT_CLOSE_ON_FREE | BEV_OPT_THREADSAFE | BEV_OPT_DEFER_CALLBACKS);
+	if (NULL == _bev)
 	{
 		return false;
 	}
+#ifdef TRANS_TCP_NO_DELAY
+	evutil_socket_t fd = bufferevent_getfd(_bev);
+	int enable = 1;
+	setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, (void *)&enable, sizeof(enable));
+// IPPROTO_TCP SOL_SOCKET
+#endif
 
 	bufferevent_setcb(_bev, readCallback, writeCallback, eventCallback, this);
 	if (-1 == bufferevent_enable(_bev, EV_READ | EV_WRITE))
@@ -37,7 +59,6 @@ bool TcpClient::connect(const char *ip, uint16_t port)
 		_bev = NULL;
 		return false;
 	}
-
 
 	struct sockaddr_in serverAddr;
 	memset(&serverAddr, 0, sizeof(serverAddr));
@@ -101,6 +122,5 @@ void TcpClient::eventCallback(struct bufferevent *bev, short events, void *ctx)
 	TcpClient *socket = (TcpClient *)ctx;
 	socket->handleEvent(events);
 }
-
 
 } /* namespace translib */
