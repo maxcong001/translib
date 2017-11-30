@@ -105,6 +105,8 @@ void Timer::reset()
 	{
 		event_free(_event);
 		_event = NULL;
+		// make sure when we call isFinished, it is fininshed
+		_curRound = _round + 1;
 	}
 }
 
