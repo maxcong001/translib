@@ -24,7 +24,7 @@ void timerManagerExample()
 	translib::Loop loop;
 	translib::TimerManager TM(loop);
 	int counter = 10;
-	int timerIDCb001 = 100;
+	int timerIDCb001;
 	__LOG(debug, "the address of timerIDCb001 is : " << (void *)(&timerIDCb001));
 	{
 		auto cbTimer = TM.getTimer(&timerIDCb001);

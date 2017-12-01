@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2016-20017 Max Cong <savagecm@qq.com>
+ * this code can be found at https://github.com/maxcong001/CPP_test_env
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -22,76 +23,48 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#include "include/testInclude.hpp"
+#include "timerManagerTest/timerManagerTest.hpp"
 
-#pragma once
-
-#include "loop.h"
-#include "timer.h"
-#include <unordered_map>
-#include <atomic>
-#include <thread>
-#include <algorithm>
-
-namespace translib
+int main()
 {
-class Loop;
-class Timer;
-#define AUDIT_TIMER 5000
-class TimerManager
-{
-  public:
-	TimerManager() : _loop(loop), loop()
+	// setup log related
+	set_log_level(logger_iface::log_level::debug);
+
+	timerManagerWhole();
+
+	// get project instance
+	auto project_instance = Singleton<test_project_base>::Instance();
+	// add your suit here
+	project_instance->add_suit(timerManagerSuit);
+	// run!
+	project_instance->run();
+	// destroy the project instance
+	Singleton<test_project_base>::DestroyInstance();
+	// dump result
+	int pass = 0;
+	int fail = 0;
+	for (auto i : case_reslut_list)
 	{
-		init(true);
-		audit_timer = new Timer(_loop);
-		audit_timer->startForever(AUDIT_TIMER, [] {
-			translib::TimerManager::instance()->auditTimer();
-		});
-	}
-	TimerManager(translib::Loop &loop_in) : _loop(loop_in)
-	{
-		init(false);
-		audit_timer = new Timer(_loop);
-		audit_timer->startForever(AUDIT_TIMER, [this] {
-			auditTimer();
-		});
-	}
-	~TimerManager()
-	{
-		//stop audit timer
-		if (!audit_timer)
+		string result;
+		if (std::get<1>(i) == CASE_SUCCESS)
 		{
-			delete audit_timer;
+			result = "SUCCESS";
+			pass++;
 		}
-		audit_timer = NULL;
+		else if (std::get<1>(i) == CASE_STUB)
+		{
+			cout << "now showing the result under suit : " << std::get<0>(i) << endl;
+			continue;
+		}
+		else
+		{
+			fail++;
+			result = "FAIL";
+		}
+		cout << "case name : " << std::get<0>(i) << " result is :" << result
+			 << endl;
 	}
-	// if the loop is passed outside or we start ourselves
-	bool init(bool start);
-	Timer::ptr_p getTimer(int *timerID = NULL);
-	bool killTimer(int timerID);
-	bool auditTimer();
-	static TimerManager *instance()
-	{
-		static TimerManager *ins = new TimerManager();
-		return ins;
-	}
-	std::mutex mtx;
-
-  protected:
-  private:
-	int getUniqueID()
-	{
-		return (uniqueID_atomic++);
-	}
-
-	//std::lock_guard<std::mutex> lck(mtx);
-
-	std::atomic<int> uniqueID_atomic;
-	std::unordered_map<int, Timer::ptr_p> t_map;
-
-	Loop &_loop;
-	Timer *audit_timer;
-	Loop loop;
-};
-
-} /* namespace translib */
+	cout << "total run " << (pass + fail) << " cases, " << pass << " cases pass"
+		 << ", " << fail << " cases fail " << endl;
+}
