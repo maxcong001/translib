@@ -37,6 +37,7 @@ class Timer
   public:
 	/** @brief callback fuction */
 	typedef std::function<void()> Handler;
+	typedef std::function<int(void *)> CBHandler;
 	typedef std::shared_ptr<Timer> ptr_p;
 
   public:
@@ -77,7 +78,25 @@ class Timer
 		uint32_t interval,
 		uint64_t round,
 		translib::Timer::Handler handler);
+	/**
+	 * @brief this is for adapt some wrapper function, if the callback return -1, then stop the timer.
+	 * @param interval ms
+	 * @param handler callback function
+	 * @param userData bring back while callback is called
+	 */
 
+	bool startCB(uint32_t interval, translib::Timer::CBHandler handler, void *userData)
+	{
+		_userData = userData;
+		_CBHandler = handler;
+		return startForever(interval, [this] {
+			int ret = _CBHandler(_userData);
+			if (ret == -1)
+			{
+				this->stop();
+			}
+		});
+	}
 	/** get timer interval */
 	inline uint32_t interval() const
 	{
@@ -117,6 +136,10 @@ class Timer
 	uint64_t _round;
 	uint64_t _curRound;
 	translib::Timer::Handler _handler;
+	// actually we could capture the userdata and callback, but just left it here,
+	// in case we need to get the user data and callback
+	void *_userData;
+	translib::Timer::CBHandler _CBHandler;
 };
 
 } /* namespace translib */

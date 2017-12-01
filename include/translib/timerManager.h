@@ -34,16 +34,27 @@
 
 namespace translib
 {
-
 class Loop;
 class Timer;
 #define AUDIT_TIMER 5000
 class TimerManager
 {
   public:
-	TimerManager() : _loop()
+	TimerManager() : _loop(loop), loop()
 	{
-		init();
+		init(true);
+		audit_timer = new Timer(_loop);
+		audit_timer->startForever(AUDIT_TIMER, [] {
+			translib::TimerManager::instance()->auditTimer();
+		});
+	}
+	TimerManager(translib::Loop &loop_in) : _loop(loop_in)
+	{
+		init(false);
+		audit_timer = new Timer(_loop);
+		audit_timer->startForever(AUDIT_TIMER, [] {
+			translib::TimerManager::instance()->auditTimer();
+		});
 	}
 	~TimerManager()
 	{
@@ -54,14 +65,17 @@ class TimerManager
 		}
 		audit_timer = NULL;
 	}
-	bool init();
+	// if the loop is passed outside or we start ourselves
+	bool init(bool start);
 	Timer::ptr_p getTimer(int *timerID = NULL);
 	bool killTimer(int timerID);
-	static TimerManager* instance()
+	bool auditTimer();
+	static TimerManager *instance()
 	{
-		static TimerManager* ins = new TimerManager();
+		static TimerManager *ins = new TimerManager();
 		return ins;
 	}
+	std::mutex mtx;
 
   protected:
   private:
@@ -74,9 +88,10 @@ class TimerManager
 
 	std::atomic<int> uniqueID_atomic;
 	std::unordered_map<int, Timer::ptr_p> t_map;
-	std::mutex mtx;
-	Loop _loop;
+
+	Loop &_loop;
 	Timer *audit_timer;
+	Loop loop;
 };
 
 } /* namespace translib */

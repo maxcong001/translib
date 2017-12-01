@@ -23,10 +23,11 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include "translib/timerManager.h"
+#include "logger/logger.h"
 namespace translib
 {
 
-bool TimerManager::init()
+bool TimerManager::init(bool start)
 {
 #if 0
 	auto work_fun = std::bind(&TimerManager::do_work, this);
@@ -36,18 +37,11 @@ bool TimerManager::init()
 	// suppose when the loop stop, the thread will exit then.
 	std::thread timer_thread(work_fun);
 #endif
-	_loop.start(true);
-	//start audit timer
-	audit_timer = new Timer(_loop);
-	audit_timer->startForever(AUDIT_TIMER, [this] {
-		// is this right?
-		for_each(t_map.begin(), t_map.end(), [&](std::pair<const int, Timer::ptr_p> &i) {
-			if ((i.second)->isFinished())
-			{
-				t_map.erase(i.first);
-			}
-		});
-	});
+	if (start)
+	{
+		_loop.start(true);
+	}
+
 	return true;
 }
 
@@ -55,16 +49,48 @@ Timer::ptr_p TimerManager::getTimer(int *timerID)
 {
 	int tid = getUniqueID();
 	Timer::ptr_p tmp_ptr(new Timer(_loop));
-	t_map.emplace(tid, tmp_ptr);
+	{
+		std::lock_guard<std::mutex> lck(mtx);
+		t_map.emplace(tid, tmp_ptr);
+	}
 	if (timerID)
 	{
 		*timerID = tid;
 	}
 	return tmp_ptr;
 }
+bool TimerManager::auditTimer()
+{
+	{
+		std::lock_guard<std::mutex> lck(mtx);
+
+		for (auto i = t_map.begin(); i != t_map.end();)
+		{
+			__LOG(debug, "[audit] now process timer with ID : " << i->first);
+			if ((i->second)->isFinished())
+			{
+				t_map.erase(i++);
+			}
+			else
+			{
+				i++;
+			}
+		}
+	}
+	__LOG(debug, "audit done"
+					 << ". There are " << t_map.size() << " timers left");
+	return true;
+}
 // you can call timer.stop or pass in the ID and we will kill the timer
 bool TimerManager::killTimer(int timerID)
 {
+	__LOG(debug, "before killing the timer " << timerID << ". There are " << t_map.size() << " timer");
+	{
+		std::lock_guard<std::mutex> lck(mtx);
+		t_map.erase(timerID);
+	}
+	__LOG(debug, "kill timer with ID : " << timerID << ". Now there are " << t_map.size() << " timer");
+#if 0
 	auto iter = t_map.find(timerID);
 	if (iter != t_map.end())
 	{
@@ -73,6 +99,8 @@ bool TimerManager::killTimer(int timerID)
 	else
 	{
 	}
+#endif
+
 	return true;
 }
 

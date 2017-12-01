@@ -12,10 +12,13 @@ using namespace std;
 
 #include "translib/example/index.h"
 #include "translib/define.h"
-
+#include "logger/logger.h"
 int main(int argc, char *argv[])
 {
-	string cmd = "tcp";
+	// setup log related
+	set_log_level(logger_iface::log_level::debug);
+
+	string cmd = "TM";
 	if (argc > 1)
 	{
 		cmd = argv[1];
