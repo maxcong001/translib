@@ -29,7 +29,7 @@
 #include "eventFdTest/testCases/case_pool.hpp"
 #include "eventFdTest/testEnv/testEnv.hpp"
 class test_project_base;
-int eventFdrWhole()
+int AddCases_eventFd()
 {
     // prepare suit here
     eventFdSuit->addCase(event_FD_basic_case);

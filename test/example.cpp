@@ -31,18 +31,23 @@ int main()
 	// setup log related
 	set_log_level(logger_iface::log_level::debug);
 
-	timerManagerWhole();
-	eventFdrWhole();
+	// add cases to the suit
+	AddCases_timerManager();
+	AddCases_eventFd();
 
 	// get project instance
 	auto project_instance = Singleton<test_project_base>::Instance();
+
 	// add your suit here
 	project_instance->add_suit(timerManagerSuit);
 	project_instance->add_suit(eventFdSuit);
+
 	// run!
 	project_instance->run();
+
 	// destroy the project instance
 	Singleton<test_project_base>::DestroyInstance();
+
 	// dump result
 	int pass = 0;
 	int fail = 0;

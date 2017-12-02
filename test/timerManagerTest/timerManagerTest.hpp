@@ -29,7 +29,7 @@
 #include "timerManagerTest/testCases/case_pool.hpp"
 #include "timerManagerTest/testEnv/testEnv.hpp"
 class test_project_base;
-int timerManagerWhole()
+int AddCases_timerManager()
 {
     // prepare suit here
     timerManagerSuit->addCase(TM_basic_case);
