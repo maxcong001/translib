@@ -25,6 +25,12 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include "include/testUtil.hpp"
+#include "translib/loop.h"
 
-shared_ptr<test_suit_base> timerManagerSuit(new test_suit_base("timerManagerSuit"));
-shared_ptr<test_suit_base> eventFdSuit(new test_suit_base("eventFdSuit"));
+// name: dbw_001
+// info: this field should record the case info
+case_result event_FD_basic_body(void *arg)
+{
+
+  return EXCEPT_EQ("test", "test");
+}

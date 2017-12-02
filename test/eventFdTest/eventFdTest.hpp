@@ -1,4 +1,3 @@
-#pragma once
 /*
  * Copyright (c) 2016-20017 Max Cong <savagecm@qq.com>
  * this code can be found at https://github.com/maxcong001/CPP_test_env
@@ -24,7 +23,15 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#include "include/testUtil.hpp"
 
-shared_ptr<test_suit_base> timerManagerSuit(new test_suit_base("timerManagerSuit"));
-shared_ptr<test_suit_base> eventFdSuit(new test_suit_base("eventFdSuit"));
+#include "include/testInclude.hpp"
+#include "eventFdTest/testBody/testCasesBody.hpp"
+#include "eventFdTest/testCases/case_pool.hpp"
+#include "eventFdTest/testEnv/testEnv.hpp"
+class test_project_base;
+int eventFdrWhole()
+{
+    // prepare suit here
+    eventFdSuit->addCase(event_FD_basic_case);
+    return 0;
+}

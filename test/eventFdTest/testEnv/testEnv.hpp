@@ -25,6 +25,20 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include "include/testUtil.hpp"
+void *event_FD_basic_env()
+{
+  std::cout << "prepare env is called" << std::endl;
+  return NULL;
+}
 
-shared_ptr<test_suit_base> timerManagerSuit(new test_suit_base("timerManagerSuit"));
-shared_ptr<test_suit_base> eventFdSuit(new test_suit_base("eventFdSuit"));
+void event_FD_basic_env_destroy(void *arg)
+{
+  // note: in your destroy function, you should set the arg to NULL
+  if (arg)
+  {
+    // your destroy code should write here
+
+    arg = NULL;
+  }
+  std::cout << "destroy env is called" << std::endl;
+}

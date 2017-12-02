@@ -24,7 +24,6 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#include "eventFdTest/testEnv/testEnv.hpp"
 #include "include/testUtil.hpp"
-
-shared_ptr<test_suit_base> timerManagerSuit(new test_suit_base("timerManagerSuit"));
-shared_ptr<test_suit_base> eventFdSuit(new test_suit_base("eventFdSuit"));
+shared_ptr<test_case_base> event_FD_basic_case(new test_case_base(event_FD_basic_env, event_FD_basic_body, event_FD_basic_env_destroy, "event_FD basic case", "basic test of event fd "));

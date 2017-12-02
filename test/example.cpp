@@ -25,18 +25,20 @@
  */
 #include "include/testInclude.hpp"
 #include "timerManagerTest/timerManagerTest.hpp"
-
+#include "eventFdTest/eventFdTest.hpp"
 int main()
 {
 	// setup log related
 	set_log_level(logger_iface::log_level::debug);
 
 	timerManagerWhole();
+	eventFdrWhole();
 
 	// get project instance
 	auto project_instance = Singleton<test_project_base>::Instance();
 	// add your suit here
 	project_instance->add_suit(timerManagerSuit);
+	project_instance->add_suit(eventFdSuit);
 	// run!
 	project_instance->run();
 	// destroy the project instance
