@@ -1,3 +1,4 @@
+#pragma once
 /*
  * Copyright (c) 2016-20017 Max Cong <savagecm@qq.com>
  * Redistribution and use in source and binary forms, with or without
@@ -22,17 +23,40 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#include "logger/logger.h"
+#include "translib/define.h"
+#include <unistd.h>
+#include <sys/eventfd.h>
+namespace translib
+{
 
-#ifndef EXAMPLE_INDEX_H_
-#define EXAMPLE_INDEX_H_
+/**
+ * @brief EventFdClient base 
+ */
+class EventFdClient
+{
+public:
+  EventFdClient() = delete;
+  // Note:!! please make sure your fd is non-blocking
+  // for example: int ev_fd = eventfd(0, EFD_NONBLOCK|EFD_CLOEXEC);
+  EventFdClient(int efd) : eventFd(efd), one(1)
+  {
+  }
+  virtual ~EventFdClient(){}
 
-void timerExample();
+  int send()
+  {
+    int ret = write(eventFd, &one, sizeof one);
+    if (ret != sizeof one)
+    {
+      __LOG(error, "write event fd : " << eventFd << " fail");
+    }
+    return ret;
+  }
 
-void tcpExample();
+private:
+  int eventFd;
+  uint64_t one;
+};
 
-void httpExample();
-void timerManagerExample();
-
-void eventFdExample();
-
-#endif /* EXAMPLE_INDEX_H_ */
+} /* namespace translib */

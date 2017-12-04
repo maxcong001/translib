@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2016-20017 Max Cong <savagecm@qq.com>
+ * this code can be found at https://github.com/maxcong001/CPP_test_env
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -23,11 +24,14 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
-void timerExample();
-
-void tcpExample();
-
-void httpExample();
-void timerManagerExample();
-
+#include "include/testInclude.hpp"
+#include "timerManagerTest/testBody/testCasesBody.hpp"
+#include "timerManagerTest/testCases/case_pool.hpp"
+#include "timerManagerTest/testEnv/testEnv.hpp"
+class test_project_base;
+int AddCases_timerManager()
+{
+    // prepare suit here
+    timerManagerSuit->addCase(TM_basic_case);
+    return 0;
+}

@@ -34,7 +34,10 @@ Timer::Timer(const translib::Loop &loop) : _loop(loop),
 										   _interval(0),
 										   _round(1),
 										   _curRound(0),
-										   _handler(NULL)
+										   _handler(NULL),
+										   _userData(NULL),
+										   _CBHandler(NULL)
+
 {
 }
 
@@ -105,6 +108,8 @@ void Timer::reset()
 	{
 		event_free(_event);
 		_event = NULL;
+		// make sure when we call isFinished, it is fininshed
+		_curRound = _round + 1;
 	}
 }
 

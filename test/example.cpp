@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2016-20017 Max Cong <savagecm@qq.com>
+ * this code can be found at https://github.com/maxcong001/CPP_test_env
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -22,17 +23,55 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#include "include/testInclude.hpp"
+#include "timerManagerTest/timerManagerTest.hpp"
+#include "eventFdTest/eventFdTest.hpp"
+int main()
+{
+	// setup log related
+	set_log_level(logger_iface::log_level::debug);
 
-#ifndef EXAMPLE_INDEX_H_
-#define EXAMPLE_INDEX_H_
+	// add cases to the suit
+	AddCases_timerManager();
+	AddCases_eventFd();
 
-void timerExample();
+	// get project instance
+	auto project_instance = Singleton<test_project_base>::Instance();
 
-void tcpExample();
+	// add your suit here
+	project_instance->add_suit(timerManagerSuit);
+	project_instance->add_suit(eventFdSuit);
 
-void httpExample();
-void timerManagerExample();
+	// run!
+	project_instance->run();
 
-void eventFdExample();
+	// destroy the project instance
+	Singleton<test_project_base>::DestroyInstance();
 
-#endif /* EXAMPLE_INDEX_H_ */
+	// dump result
+	int pass = 0;
+	int fail = 0;
+	for (auto i : case_reslut_list)
+	{
+		string result;
+		if (std::get<1>(i) == CASE_SUCCESS)
+		{
+			result = "SUCCESS";
+			pass++;
+		}
+		else if (std::get<1>(i) == CASE_STUB)
+		{
+			cout << "now showing the result under suit : " << std::get<0>(i) << endl;
+			continue;
+		}
+		else
+		{
+			fail++;
+			result = "FAIL";
+		}
+		cout << "case name : " << std::get<0>(i) << " result is :" << result
+			 << endl;
+	}
+	cout << "total run " << (pass + fail) << " cases, " << pass << " cases pass"
+		 << ", " << fail << " cases fail " << endl;
+}

@@ -1,0 +1,33 @@
+{
+    "_readMe": "Review list of sync operations, then use Ftp-sync: Commit command to accept changes",
+    "_warning": "This file should not be saved, reopened review file won't work!",
+    "filesToUpdate": [],
+    "filesToAdd": [
+        "include/logger/logger.h",
+        "include/translib/define.h",
+        "include/translib/eventClient.h",
+        "include/translib/eventServer.h",
+        "include/translib/frameLoop.h",
+        "include/translib/httpRequest.h",
+        "include/translib/httpServer.h",
+        "include/translib/loop.h",
+        "include/translib/tcpClient.h",
+        "include/translib/tcpClientTPKT.h",
+        "include/translib/tcpServer.h",
+        "include/translib/tcpServerDispatcher.h",
+        "include/translib/tcpSession.h",
+        "include/translib/tcpServerTPKT.h",
+        "include/translib/tcpSessionFactory.h",
+        "include/translib/tcpSocket.h",
+        "include/translib/timer.h",
+        "include/translib/timerManager.h",
+        "include/translib/example/index.h"
+    ],
+    "dirsToAdd": [
+        "include/logger",
+        "include/translib",
+        "include/translib/example"
+    ],
+    "filesToRemove": [],
+    "dirsToRemove": []
+}

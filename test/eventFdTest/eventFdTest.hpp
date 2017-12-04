@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2016-20017 Max Cong <savagecm@qq.com>
+ * this code can be found at https://github.com/maxcong001/CPP_test_env
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -23,16 +24,14 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef EXAMPLE_INDEX_H_
-#define EXAMPLE_INDEX_H_
-
-void timerExample();
-
-void tcpExample();
-
-void httpExample();
-void timerManagerExample();
-
-void eventFdExample();
-
-#endif /* EXAMPLE_INDEX_H_ */
+#include "include/testInclude.hpp"
+#include "eventFdTest/testBody/testCasesBody.hpp"
+#include "eventFdTest/testCases/case_pool.hpp"
+#include "eventFdTest/testEnv/testEnv.hpp"
+class test_project_base;
+int AddCases_eventFd()
+{
+    // prepare suit here
+    eventFdSuit->addCase(event_FD_basic_case);
+    return 0;
+}

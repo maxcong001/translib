@@ -1,5 +1,7 @@
+#pragma once
 /*
  * Copyright (c) 2016-20017 Max Cong <savagecm@qq.com>
+ * this code can be found at https://github.com/maxcong001/CPP_test_env
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -22,17 +24,20 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#include "include/testUtil.hpp"
 
-#ifndef EXAMPLE_INDEX_H_
-#define EXAMPLE_INDEX_H_
-
-void timerExample();
-
-void tcpExample();
-
-void httpExample();
-void timerManagerExample();
-
-void eventFdExample();
-
-#endif /* EXAMPLE_INDEX_H_ */
+class test_project_base {
+ public:
+  void add_suit(std::shared_ptr<test_suit_base> test_suit) {
+    _suit[suitID] = test_suit;
+    suitID++;
+  }
+  void run() {
+    for (auto i : _suit) {
+      ADD_SUIT_INFO((i.second)->get_name());
+      (i.second)->run();
+    }
+  }
+  int suitID;
+  std::unordered_map<int, std::shared_ptr<test_suit_base> > _suit;
+};

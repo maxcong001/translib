@@ -22,49 +22,54 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-#include <iostream>
-#include <functional>
-using namespace std;
-
-#include "translib/httpServer.h"
+#include "translib/eventClient.h"
+#include "translib/eventServer.h"
+#include "translib/loop.h"
+#include "logger/logger.h"
+#include "translib/timerManager.h"
 #include "index.h"
-
-class ExampleHttpServer : public translib::HttpServer
+#include <unistd.h>
+void onEVFDRead(evutil_socket_t fd, short event, void *args)
 {
-  public:
-	void reg()
-	{
-		regHandler("/", std::bind(&ExampleHttpServer::doMainRequest, this, placeholders::_1));
-		regHandler("/test", std::bind(&ExampleHttpServer::doTestRequest, this, placeholders::_1));
-	}
+    std::cout << "recv event: " << event << " from fd: " << fd << std::endl;
+    uint64_t one;
+    int ret = read(fd, &one, sizeof one);
+    if (ret != sizeof one)
+    {
+        std::cout << "read evfd fail: " << ret << std::endl;
+        return;
+    }
+    std::cout << "read from evfd: " << one << std::endl;
+}
 
-  private:
-	void doMainRequest(translib::HttpRequest *request)
-	{
-		request->setBody("main page");
-	}
-
-	void doTestRequest(translib::HttpRequest *request)
-	{
-		request->setBody("test page");
-	}
-};
-
-void httpExample()
+void eventFdExample()
 {
-	ExampleHttpServer server;
-	if (!server.listen("127.0.0.1", 4567))
-	{
-		cout << "listen failed" << endl;
-	}
+    // create evnet fd
+    int ev_fd = eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);
+    // start server
+    translib::Loop loop;
+    //event_base *loop = event_base_new();
 
-	server.reg();
+    translib::EventFdServer EVFDServer(loop, ev_fd, onEVFDRead);
+    //event *ev_fd_event = event_new(loop, ev_fd, EV_READ | EV_PERSIST, &onEVFDRead, NULL);
+    //event_add(ev_fd_event, NULL);
+    //auto thread1 = std::thread([&]() -> void { event_base_dispatch(loop); });
+    //thread1.detach();
+#if 0
+    {
+        uint64_t one = 1;
+        int ret = write(ev_fd, &one, sizeof one);
+        if (ret != sizeof one)
+        {
+            std::cout << "write evfd fail: " << ret << std::endl;
+        }
+    }
+#endif
+    translib::EventFdClient EVFDClient(ev_fd);
 
-	if (!server.start())
-	{
-		cout << "start failed" << endl;
-	}
+    //EVFDClient.send();
 
-	server.wait();
+    translib::TimerManager::instance()->getTimer()->startRounds(500, 100, [&] { EVFDClient.send(); });
+    //sleep(1);
+    loop.start(false);
 }

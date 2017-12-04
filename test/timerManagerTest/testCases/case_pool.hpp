@@ -1,5 +1,7 @@
+#pragma once
 /*
  * Copyright (c) 2016-20017 Max Cong <savagecm@qq.com>
+ * this code can be found at https://github.com/maxcong001/CPP_test_env
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -22,17 +24,6 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-#ifndef EXAMPLE_INDEX_H_
-#define EXAMPLE_INDEX_H_
-
-void timerExample();
-
-void tcpExample();
-
-void httpExample();
-void timerManagerExample();
-
-void eventFdExample();
-
-#endif /* EXAMPLE_INDEX_H_ */
+#include "timerManagerTest/testEnv/testEnv.hpp"
+#include "include/testUtil.hpp"
+shared_ptr<test_case_base> TM_basic_case(new test_case_base(TM_basic_env, TM_basic_body, TM_basic_env_destroy, "TM basic case", "basic test of timer manager "));
