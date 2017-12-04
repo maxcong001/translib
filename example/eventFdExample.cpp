@@ -69,7 +69,7 @@ void eventFdExample()
 
     //EVFDClient.send();
 
-    translib::TimerManager::instance()->getTimer()->startRounds(500, 100, [&] { EVFDClient.send(); });
+    translib::TimerManager::instance()->getTimer()->startOnce(500, [&] { EVFDClient.send(); });
     //sleep(1);
     loop.start(false);
 }
