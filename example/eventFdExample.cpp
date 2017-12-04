@@ -1,4 +1,3 @@
-#pragma once
 /*
  * Copyright (c) 2016-20017 Max Cong <savagecm@qq.com>
  * Redistribution and use in source and binary forms, with or without
@@ -23,40 +22,54 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#include "translib/eventClient.h"
+#include "translib/eventServer.h"
+#include "translib/loop.h"
 #include "logger/logger.h"
-#include "translib/define.h"
+#include "translib/timerManager.h"
+#include "index.h"
 #include <unistd.h>
-#include <sys/eventfd.h>
-namespace translib
+void onEVFDRead(evutil_socket_t fd, short event, void *args)
 {
-
-/**
- * @brief EventFdClient base 
- */
-class EventFdClient
-{
-public:
-  EventFdClient() = delete;
-  // Note:!! please make sure your fd is non-blocking
-  // for example: int ev_fd = eventfd(0, EFD_NONBLOCK|EFD_CLOEXEC);
-  EventFdClient(int efd) : eventFd(efd), one(1)
-  {
-  }
-  virtual ~EventFdClient(){}
-
-  int send()
-  {
-    int ret = write(eventFd, &one, sizeof one);
+    std::cout << "recv event: " << event << " from fd: " << fd << std::endl;
+    uint64_t one;
+    int ret = read(fd, &one, sizeof one);
     if (ret != sizeof one)
     {
-      __LOG(error, "write event fd : " << eventFd << " fail");
+        std::cout << "read evfd fail: " << ret << std::endl;
+        return;
     }
-    return ret;
-  }
+    std::cout << "read from evfd: " << one << std::endl;
+}
 
-private:
-  int eventFd;
-  uint64_t one;
-};
+void eventFdExample()
+{
+    // create evnet fd
+    int ev_fd = eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);
+    // start server
+    translib::Loop loop;
+    //event_base *loop = event_base_new();
 
-} /* namespace translib */
+    translib::EventFdServer EVFDServer(loop, ev_fd, onEVFDRead);
+    //event *ev_fd_event = event_new(loop, ev_fd, EV_READ | EV_PERSIST, &onEVFDRead, NULL);
+    //event_add(ev_fd_event, NULL);
+    //auto thread1 = std::thread([&]() -> void { event_base_dispatch(loop); });
+    //thread1.detach();
+#if 0
+    {
+        uint64_t one = 1;
+        int ret = write(ev_fd, &one, sizeof one);
+        if (ret != sizeof one)
+        {
+            std::cout << "write evfd fail: " << ret << std::endl;
+        }
+    }
+#endif
+    translib::EventFdClient EVFDClient(ev_fd);
+
+    //EVFDClient.send();
+
+    translib::TimerManager::instance()->getTimer()->startRounds(500, 100, [&] { EVFDClient.send(); });
+    //sleep(1);
+    loop.start(false);
+}
