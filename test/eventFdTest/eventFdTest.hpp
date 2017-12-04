@@ -33,5 +33,6 @@ int AddCases_eventFd()
 {
     // prepare suit here
     eventFdSuit->addCase(event_FD_basic_case);
+    eventFdSuit->addCase(event_FD_count_case);
     return 0;
 }

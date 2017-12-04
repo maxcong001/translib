@@ -48,26 +48,10 @@ void eventFdExample()
     int ev_fd = eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);
     // start server
     translib::Loop loop;
-    //event_base *loop = event_base_new();
 
     translib::EventFdServer EVFDServer(loop, ev_fd, onEVFDRead);
-    //event *ev_fd_event = event_new(loop, ev_fd, EV_READ | EV_PERSIST, &onEVFDRead, NULL);
-    //event_add(ev_fd_event, NULL);
-    //auto thread1 = std::thread([&]() -> void { event_base_dispatch(loop); });
-    //thread1.detach();
-#if 0
-    {
-        uint64_t one = 1;
-        int ret = write(ev_fd, &one, sizeof one);
-        if (ret != sizeof one)
-        {
-            std::cout << "write evfd fail: " << ret << std::endl;
-        }
-    }
-#endif
-    translib::EventFdClient EVFDClient(ev_fd);
 
-    //EVFDClient.send();
+    translib::EventFdClient EVFDClient(ev_fd);
 
     translib::TimerManager::instance()->getTimer()->startOnce(500, [&] { EVFDClient.send(); });
     //sleep(1);

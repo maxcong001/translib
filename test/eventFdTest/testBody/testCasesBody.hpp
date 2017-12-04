@@ -30,9 +30,12 @@
 #include <sys/eventfd.h>
 #include "translib/eventServer.h"
 #include "translib/eventClient.h"
-#include <future> 
-std::atomic<bool> case_success(false);
+#include <future>
+#include "logger/logger.h"
+/******************************************************************************************/
+// basic test
 std::promise<bool> case_result_promise;
+
 void onEVFDRead(evutil_socket_t fd, short event, void *args)
 {
   std::cout << "recv event: " << event << " from fd: " << fd << std::endl;
@@ -44,15 +47,13 @@ void onEVFDRead(evutil_socket_t fd, short event, void *args)
     return;
   }
   std::cout << "read from evfd: " << one << std::endl;
-  //case_success = false;
   case_result_promise.set_value(true);
-
 }
-
-// name: dbw_001
+// name: event_FD_basic_body
 // info: this field should record the case info
 case_result event_FD_basic_body(void *arg)
 {
+
   int ev_fd = eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);
   translib::Loop loop;
   translib::EventFdServer EVFDServer(loop, ev_fd, onEVFDRead);
@@ -60,9 +61,60 @@ case_result event_FD_basic_body(void *arg)
 
   translib::TimerManager::instance()->getTimer()->startOnce(1, [&] { EVFDClient.send(); });
 
-  //sleep(1);
   loop.start(true);
   std::future<bool> fut = case_result_promise.get_future();
-  //std::this_thread::sleep_for(std::chrono::milliseconds(5));
-  return fut.get() ? CASE_SUCCESS : CASE_FAIL;
+  fut.wait();
+  case_result ret = fut.get() ? CASE_SUCCESS : CASE_FAIL;
+
+  return ret;
+
+  return CASE_SUCCESS;
+}
+/******************************************************************************************/
+// test if we got the number of test count
+std::promise<bool> case_result_promise_001;
+std::atomic<int> fd_count(0);
+#define FD_TIMES 10
+void onEVFDRead_001(evutil_socket_t fd, short event, void *args)
+{
+  std::cout << "recv event: " << event << " from fd: " << fd << std::endl;
+  uint64_t one;
+  int ret = read(fd, &one, sizeof one);
+  if (ret != sizeof one)
+  {
+    std::cout << "read evfd fail: " << ret << std::endl;
+    return;
+  }
+  std::cout << "read from evfd: " << one << std::endl;
+  fd_count += one;
+  if (fd_count == FD_TIMES)
+  {
+    __LOG(warn, "case onEVFDRead_001 success!!!!");
+    case_result_promise_001.set_value(true);
+    fd_count = 0;
+  }
+}
+case_result event_FD_count_test_body(void *arg)
+{
+  int ev_fd = eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);
+  translib::Loop loop;
+  translib::EventFdServer EVFDServer(loop, ev_fd, onEVFDRead_001);
+  translib::EventFdClient EVFDClient(ev_fd);
+
+  translib::TimerManager::instance()->getTimer()->startRounds(100, 10, [&] { EVFDClient.send(); });
+
+  //sleep(1);
+  loop.start(true);
+  __LOG(warn, "get future");
+  std::future<bool> fut = case_result_promise_001.get_future();
+   __LOG(warn, "get future success"); 
+  fut.wait();
+  __LOG(warn, "get value in the future");
+  case_result ret = fut.get() ? CASE_SUCCESS : CASE_FAIL;
+  __LOG(warn, "result is :" << ret);
+  // reset the promise
+
+  //case_result_promise = std::promise<bool>();
+
+  return ret;
 }

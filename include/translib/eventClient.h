@@ -39,15 +39,17 @@ public:
   EventFdClient() = delete;
   // Note:!! please make sure your fd is non-blocking
   // for example: int ev_fd = eventfd(0, EFD_NONBLOCK|EFD_CLOEXEC);
-  EventFdClient(int efd) : eventFd(efd), one(1)
+  EventFdClient(int efd) : one(1)
   {
+    eventFd = efd;
+    __LOG(warn, "event fd is " << eventFd);
   }
-  virtual ~EventFdClient(){}
+  virtual ~EventFdClient() {}
 
   int send()
   {
-    int ret = write(eventFd, &one, sizeof one);
-    if (ret != sizeof one)
+    int ret = write(eventFd, &one, sizeof(one));
+    if (ret != sizeof(one))
     {
       __LOG(error, "write event fd : " << eventFd << " fail");
     }
