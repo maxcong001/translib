@@ -28,3 +28,4 @@
 #include "include/testUtil.hpp"
 shared_ptr<test_case_base> event_FD_basic_case(new test_case_base(event_FD_basic_env, event_FD_basic_body, event_FD_basic_env_destroy, "event_FD basic case", "basic test of event fd "));
 shared_ptr<test_case_base> event_FD_count_case(new test_case_base(event_FD_basic_env, event_FD_count_test_body, event_FD_basic_env_destroy, "event_FD fd count case", "basic test of event fd count"));
+shared_ptr<test_case_base> event_FD_queue_counter_case(new test_case_base(event_FD_basic_env, event_FD_queue_counter_test_body, event_FD_basic_env_destroy, "event_FD fd count case", "basic test of event fd count"));

@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 	// setup log related
 	set_log_level(logger_iface::log_level::debug);
 
-	string cmd = "evfd";
+	string cmd = "TM";
 	if (argc > 1)
 	{
 		cmd = argv[1];
