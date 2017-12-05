@@ -104,7 +104,66 @@ case_result event_FD_count_test_body(void *arg)
   __LOG(warn, " case is running");
   while (fut.wait_for(span) == std::future_status::timeout)
   {
-    std::cout << '.'<<std::flush;;
+    std::cout << '.' << std::flush;
+    ;
+  }
+  if (fut.valid())
+  {
+    case_result ret = fut.get() ? CASE_SUCCESS : CASE_FAIL;
+    return ret;
+  }
+  else
+  {
+    return CASE_FAIL;
+  }
+}
+/******************************************************************************************/
+// test if the server side does not got the chance to process the message
+std::promise<bool> case_result_promise_002;
+std::atomic<int> fd_count_002(0);
+
+void onEVFDRead_002(evutil_socket_t fd, short event, void *args)
+{
+  static bool flag = false;
+  std::this_thread::sleep_for(std::chrono::seconds(1));
+  //  std::cout << "recv event: " << event << " from fd: " << fd << std::endl;
+  uint64_t one;
+  int ret = read(fd, &one, sizeof one);
+  if (ret != sizeof one)
+  {
+    std::cout << "read evfd fail: " << ret << std::endl;
+    return;
+  }
+  if (one > 1)
+  {
+    flag = true;
+  }
+  std::cout << "read from evfd: " << one << std::endl;
+  fd_count += one;
+  if (fd_count == FD_TIMES && flag)
+  {
+    __LOG(warn, "case onEVFDRead_001 success!!!!");
+    case_result_promise_002.set_value(true);
+    fd_count = 0;
+  }
+}
+case_result event_FD_queue_counter_test_body(void *arg)
+{
+  __LOG(warn, "NOTE: we will send " << FD_TIMES << " fd message at speed " << (1000 / FD_INTERVAL) << " msg/sec. This case will run " << ((FD_TIMES * FD_INTERVAL) / 1000) << " seconds");
+  int ev_fd = eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);
+  translib::Loop loop;
+  translib::EventFdServer EVFDServer(loop, ev_fd, onEVFDRead_002);
+  translib::EventFdClient EVFDClient(ev_fd);
+  translib::TimerManager::instance()->getTimer()->startRounds(FD_INTERVAL, FD_TIMES, [&] { EVFDClient.send(); });
+  loop.start(true);
+  std::future<bool> fut = case_result_promise_002.get_future();
+  std::chrono::milliseconds span(100); //((FD_TIMES * FD_INTERVAL) / 1000) * 2);
+  __LOG(warn, "NOTE: we will send " << FD_TIMES << " fd message at speed " << (1000 / FD_INTERVAL) << " msg/sec. This case will run " << ((FD_TIMES * FD_INTERVAL) / 1000) << " seconds");
+  __LOG(warn, " case is running");
+  while (fut.wait_for(span) == std::future_status::timeout)
+  {
+    std::cout << '.' << std::flush;
+    ;
   }
   if (fut.valid())
   {
