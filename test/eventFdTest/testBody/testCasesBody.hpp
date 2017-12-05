@@ -91,7 +91,7 @@ void onEVFDRead_001(evutil_socket_t fd, short event, void *args)
 }
 case_result event_FD_count_test_body(void *arg)
 {
-  __LOG(error, "NOTE: we will send " << FD_TIMES << " fd message at speed " << (1000 / FD_INTERVAL) << " msg/sec. This case will run " << ((FD_TIMES * FD_INTERVAL) / 1000) << " seconds");
+  __LOG(warn, "NOTE: we will send " << FD_TIMES << " fd message at speed " << (1000 / FD_INTERVAL) << " msg/sec. This case will run " << ((FD_TIMES * FD_INTERVAL) / 1000) << " seconds");
   int ev_fd = eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);
   translib::Loop loop;
   translib::EventFdServer EVFDServer(loop, ev_fd, onEVFDRead_001);

@@ -42,7 +42,7 @@ public:
   EventFdClient(int efd) : one(1)
   {
     eventFd = efd;
-    __LOG(warn, "event fd is " << eventFd);
+    __LOG(debug, "event fd is " << eventFd);
   }
   virtual ~EventFdClient() {}
 
