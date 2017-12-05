@@ -46,7 +46,14 @@ class EventFdServer
     EventFdServer(event_base *evBase_in, int efd, evCb cb) : eventFd(efd), one(1), evBase(evBase_in), eventCallback(cb)
     {
         _event = event_new(evBase, eventFd, EV_READ | EV_PERSIST, eventCallback, NULL);
-        event_add(_event, NULL);
+        if (NULL == _event)
+        {
+            return;
+        }
+        if (0 != event_add(_event, NULL))
+        {
+            return;
+        }
     }
     virtual ~EventFdServer()
     {
