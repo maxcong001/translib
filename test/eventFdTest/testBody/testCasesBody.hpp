@@ -124,6 +124,7 @@ std::atomic<int> fd_count_002(0);
 
 void onEVFDRead_002(evutil_socket_t fd, short event, void *args)
 {
+  // used to check if the received counter is more than 1
   static bool flag = false;
   std::this_thread::sleep_for(std::chrono::seconds(1));
   //  std::cout << "recv event: " << event << " from fd: " << fd << std::endl;

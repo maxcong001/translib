@@ -76,6 +76,11 @@ class TimerManager
 		return ins;
 	}
 	std::mutex mtx;
+	// get the loop
+	Loop &getLoop()
+	{
+		return _loop;
+	}
 
   protected:
   private:
