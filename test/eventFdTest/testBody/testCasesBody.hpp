@@ -96,10 +96,23 @@ case_result event_FD_count_test_body(void *arg)
   translib::Loop loop;
   translib::EventFdServer EVFDServer(loop, ev_fd, onEVFDRead_001);
   translib::EventFdClient EVFDClient(ev_fd);
-  translib::TimerManager::instance()->getTimer()->startRounds(1, FD_TIMES, [&] { EVFDClient.send(); });
+  translib::TimerManager::instance()->getTimer()->startRounds(FD_INTERVAL, FD_TIMES, [&] { EVFDClient.send(); });
   loop.start(true);
   std::future<bool> fut = case_result_promise_001.get_future();
-  fut.wait();
-  case_result ret = fut.get() ? CASE_SUCCESS : CASE_FAIL;
-  return ret;
+  std::chrono::milliseconds span(100); //((FD_TIMES * FD_INTERVAL) / 1000) * 2);
+  __LOG(warn, "NOTE: we will send " << FD_TIMES << " fd message at speed " << (1000 / FD_INTERVAL) << " msg/sec. This case will run " << ((FD_TIMES * FD_INTERVAL) / 1000) << " seconds");
+  __LOG(warn, " case is running");
+  while (fut.wait_for(span) == std::future_status::timeout)
+  {
+    std::cout << '.'<<std::flush;;
+  }
+  if (fut.valid())
+  {
+    case_result ret = fut.get() ? CASE_SUCCESS : CASE_FAIL;
+    return ret;
+  }
+  else
+  {
+    return CASE_FAIL;
+  }
 }
