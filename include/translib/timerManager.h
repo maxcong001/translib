@@ -31,7 +31,7 @@
 #include <atomic>
 #include <thread>
 #include <algorithm>
-
+#include "logger/logger.h"
 namespace translib
 {
 class Loop;
@@ -42,11 +42,11 @@ class TimerManager
   public:
 	TimerManager() : _loop(loop), loop()
 	{
-		init(true);
 		audit_timer = new Timer(_loop);
 		audit_timer->startForever(AUDIT_TIMER, [] {
 			translib::TimerManager::instance()->auditTimer();
 		});
+		init(true);
 	}
 	TimerManager(translib::Loop &loop_in) : _loop(loop_in)
 	{
@@ -58,6 +58,7 @@ class TimerManager
 	}
 	~TimerManager()
 	{
+		__LOG(warn, "destroy timmer manager");
 		//stop audit timer
 		if (!audit_timer)
 		{
@@ -81,7 +82,6 @@ class TimerManager
 	{
 		return _loop;
 	}
-
   protected:
   private:
 	int getUniqueID()

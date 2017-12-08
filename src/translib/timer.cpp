@@ -53,12 +53,14 @@ bool Timer::startRounds(
 {
 	if (NULL != _event)
 	{
+		__LOG(error, "_event is NULL!!!");
 		return false;
 	}
 
 	_event = event_new(_loop, -1, (round > 1) ? EV_PERSIST : 0, eventHandler, this);
 	if (NULL == _event)
 	{
+		__LOG(error, "event_new return fail!!!");
 		return false;
 	}
 
@@ -69,6 +71,7 @@ bool Timer::startRounds(
 
 	if (0 != event_add(_event, &tv))
 	{
+		__LOG(error, "event_add return fail!!!");
 		reset();
 		return false;
 	}
@@ -110,6 +113,10 @@ void Timer::reset()
 		_event = NULL;
 		// make sure when we call isFinished, it is fininshed
 		_curRound = _round + 1;
+	}
+	else
+	{
+		__LOG(debug, "_evnet is NULL");
 	}
 }
 

@@ -1,8 +1,8 @@
 {
-    "remotePath": "/home/mcong/feature/translib",
-    "host": "135.251.166.251",
-    "username": "mcong",
-    "password": "mcong",
+    "remotePath": "/home/max/study/github/translib",
+    "host": "192.168.56.103",
+    "username": "max",
+    "password": "savage221",
     "port": 22,
     "secure": false,
     "protocol": "sftp",

@@ -31,6 +31,11 @@ int main()
 	// setup log related
 	set_log_level(logger_iface::log_level::debug);
 
+	translib::TimerManager::instance()->getTimer()->startForever(1000, [&] {
+		__LOG(warn, "case still running!!!");
+
+	});
+
 	// add cases to the suit
 	AddCases_timerManager();
 	AddCases_eventFd();
@@ -74,4 +79,6 @@ int main()
 	}
 	cout << "total run " << (pass + fail) << " cases, " << pass << " cases pass"
 		 << ", " << fail << " cases fail " << endl;
+
+	delete translib::TimerManager::instance();
 }
