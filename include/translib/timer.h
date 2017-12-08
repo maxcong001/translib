@@ -26,6 +26,7 @@
 #pragma once
 #include "loop.h"
 #include <memory>
+#include "logger/logger.h"
 
 namespace translib
 {

@@ -56,4 +56,10 @@ void eventFdExample()
     translib::TimerManager::instance()->getTimer()->startOnce(1, [&] { EVFDClient.send(); });
     //sleep(1);
     loop.start(false);
+
+    if (ev_fd >= 0)
+    {
+        close(ev_fd);
+        ev_fd = -1;
+    }
 }

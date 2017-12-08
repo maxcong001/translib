@@ -47,9 +47,9 @@ SET_TARGET_PROPERTIES(
 
 LINK_DIRECTORIES(${PROJECT_SOURCE_DIR}/lib)
 IF(NOT ENABLE_TEST)
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} event event_pthreads)
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} event event_pthreads pthread)
 ELSE()
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} event event_pthreads)
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} event event_pthreads pthread)
 ENDIF()
 
 # Install libdbwraper to /usr/local/lib by default

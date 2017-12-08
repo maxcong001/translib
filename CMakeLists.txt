@@ -42,24 +42,3 @@ ENDIF()
 
 SEPARATE_ARGUMENTS(CMD_ARGS)
 # ADD_TEST(delivery_test ${PROJECT_SOURCE_DIR}/bin/${TEST_BINARY})
-
-ADD_CUSTOM_TARGET(example
-	COMMAND ./${EXAMPLE_BINARY} ${CMD_ARGS}
-	WORKING_DIRECTORY ${EXECUTABLE_OUTPUT_PATH}
-	COMMENT "Run examples"
-)
-
-
-ADD_CUSTOM_TARGET(memcheck
-	COMMAND command -v valgrind >/dev/null 2>&1 && valgrind -v --leak-check=full --show-reachable=yes
-	--undef-value-errors=yes --track-origins=yes --num-callers=50 ./${EXAMPLE_BINARY} ${CMD_ARGS}
-	WORKING_DIRECTORY ${EXECUTABLE_OUTPUT_PATH}
-	COMMENT "Check memory usage with valgrind"
-)
-
-
-ADD_CUSTOM_TARGET(cleanup
-	COMMAND rm -rf *
-	WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
-	COMMENT "Remove all temp files"
-)

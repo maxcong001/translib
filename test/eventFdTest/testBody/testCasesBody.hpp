@@ -62,13 +62,20 @@ case_result event_FD_basic_body(void *arg)
   std::future<bool> fut = case_result_promise.get_future();
   fut.wait();
   case_result ret = fut.get() ? CASE_SUCCESS : CASE_FAIL;
+
+  if (ev_fd >= 0)
+  {
+    close(ev_fd);
+    ev_fd = -1;
+  }
+
   return ret;
 }
 /******************************************************************************************/
 // test if we got the number of test count
 std::promise<bool> case_result_promise_001;
 std::atomic<int> fd_count(0);
-#define FD_TIMES 10000
+#define FD_TIMES 100
 #define FD_INTERVAL 1
 void onEVFDRead_001(evutil_socket_t fd, short event, void *args)
 {
@@ -107,6 +114,13 @@ case_result event_FD_count_test_body(void *arg)
     std::cout << '.' << std::flush;
     ;
   }
+
+  if (ev_fd >= 0)
+  {
+    close(ev_fd);
+    ev_fd = -1;
+  }
+
   if (fut.valid())
   {
     case_result ret = fut.get() ? CASE_SUCCESS : CASE_FAIL;
@@ -155,8 +169,13 @@ case_result event_FD_queue_counter_test_body(void *arg)
   translib::Loop loop;
   translib::EventFdServer EVFDServer(loop, ev_fd, onEVFDRead_002);
   translib::EventFdClient EVFDClient(ev_fd);
-  translib::TimerManager::instance()->getTimer()->startRounds(FD_INTERVAL, FD_TIMES, [&] { EVFDClient.send(); });
   loop.start(true);
+  translib::TimerManager::instance()->getTimer()->startRounds(FD_INTERVAL, FD_TIMES, [&] { 
+    //__LOG(warn, "before send event fd");
+    //__LOG(warn, " send return : "<<(EVFDClient.send()));
+    EVFDClient.send(); 
+    });
+
   std::future<bool> fut = case_result_promise_002.get_future();
   std::chrono::milliseconds span(100); //((FD_TIMES * FD_INTERVAL) / 1000) * 2);
   __LOG(warn, "NOTE: we will send " << FD_TIMES << " fd message at speed " << (1000 / FD_INTERVAL) << " msg/sec. This case will run " << ((FD_TIMES * FD_INTERVAL) / 1000) << " seconds");
@@ -166,6 +185,13 @@ case_result event_FD_queue_counter_test_body(void *arg)
     std::cout << '.' << std::flush;
     ;
   }
+
+  if (ev_fd >= 0)
+  {
+    close(ev_fd);
+    ev_fd = -1;
+  }
+
   if (fut.valid())
   {
     case_result ret = fut.get() ? CASE_SUCCESS : CASE_FAIL;
