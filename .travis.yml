@@ -1,0 +1,34 @@
+language: cpp
+
+# safelist
+branches:
+  only:
+  - master
+  - dev
+
+compiler:
+  - gcc
+
+cache: ccache
+
+os:
+  - linux
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - libevent-dev
+      - gcc-4.8
+      - g++-4.8
+
+
+
+before_install:
+
+
+install:
+  - if [[ "$TRAVIS_OS_NAME" != "osx" && "$CXX" = "g++" ]]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
+
+script: mkdir build && cd build && cmake .. && make && ./bin/translib_tests
