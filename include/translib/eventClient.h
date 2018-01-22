@@ -46,14 +46,15 @@ public:
   }
   virtual ~EventFdClient() {}
 
-  int send()
+  bool send()
   {
     int ret = write(eventFd, &one, sizeof(one));
     if (ret != sizeof(one))
     {
       __LOG(error, "write event fd : " << eventFd << " fail");
+      return false;
     }
-    return ret;
+    return true;
   }
 
 private:
@@ -62,7 +63,3 @@ private:
 };
 
 } /* namespace translib */
-
-
-
-

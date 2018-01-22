@@ -40,7 +40,7 @@ class Timer;
 class TimerManager
 {
   public:
-	TimerManager() : _loop(loop), loop()
+	TimerManager() : uniqueID_atomic(0), t_map(), audit_timer(NULL), _loop(loop), loop()
 	{
 		init(true);
 		audit_timer = new Timer(_loop);
@@ -48,7 +48,7 @@ class TimerManager
 			translib::TimerManager::instance()->auditTimer();
 		});
 	}
-	TimerManager(translib::Loop &loop_in) : _loop(loop_in)
+	TimerManager(translib::Loop &loop_in) : uniqueID_atomic(0), t_map(), audit_timer(NULL), _loop(loop_in)
 	{
 		init(false);
 		audit_timer = new Timer(_loop);
@@ -59,7 +59,7 @@ class TimerManager
 	~TimerManager()
 	{
 		//stop audit timer
-		if (!audit_timer)
+		if (audit_timer)
 		{
 			delete audit_timer;
 		}
@@ -75,10 +75,6 @@ class TimerManager
 		static TimerManager *ins = new TimerManager();
 		return ins;
 	}
-	translib::Loop &getLoop()
-	{
-		return _loop;
-	}
 	std::mutex mtx;
 
   protected:
@@ -92,9 +88,8 @@ class TimerManager
 
 	std::atomic<int> uniqueID_atomic;
 	std::unordered_map<int, Timer::ptr_p> t_map;
-
-	Loop &_loop;
 	Timer *audit_timer;
+	Loop &_loop;
 	Loop loop;
 };
 

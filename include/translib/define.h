@@ -38,12 +38,20 @@
 #include <mutex>
 #include <atomic>
 
+#include <exception>  
+
 #if (defined _WIN32) || (defined WIN32) || (defined _WIN64) || (defined WIN64)
 #define PLATFORM_WINDOWS
 #endif
 #define TPKT1_LENGTH (4)
 #define TPKT1_MAX_MSG_LENGTH (0xffffff)
 #define TPKT_VERSION1_LOW_BYTE 0x1
+// this is throw number
+#define CREATE_EVENT_FAIL "CREATE_EVENT_FAIL"
+#define EVENTFD_EVENT_NEW_ERROR "EVENTFD_EVENT_NEW_ERROR"
+#define EVENTFD_EVENT_ADD_ERROR "EVENTFD_EVENT_ADD_ERROR"
+#define TIMERMANAGER_EVENT_NEW_ERROR "TIMERMANAGER_EVENT_NEW_ERROR"
+#define TIMERMANAGER_ADD_ERROR "TIMERMANAGER_ADD_ERROR"
 namespace translib
 {
 
