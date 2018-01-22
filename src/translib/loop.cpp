@@ -49,6 +49,8 @@ Loop::Loop() : _id(0),
 		WSAStartup(MAKEWORD(2, 2), &wsadata);
 		evthread_use_windows_threads();
 #else
+		// this may cause memory leak see
+		// https://github.com/libevent/libevent/issues/55
 		evthread_use_pthreads();
 #endif //PLATFORM_WINDOWS
 	}
@@ -56,6 +58,13 @@ Loop::Loop() : _id(0),
 	_sLoops[_id] = this;
 	_sMutex.unlock();
 	_base = event_base_new();
+	if (!_base)
+	{
+		// note!!!! if you catch this exception
+		// please remember call the distructure function
+		// !!!!!!! this is important
+		throw std::logic_error(CREATE_EVENT_FAIL);
+	}
 }
 
 Loop::~Loop()

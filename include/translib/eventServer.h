@@ -48,11 +48,17 @@ class EventFdServer
         _event = event_new(evBase, eventFd, EV_READ | EV_PERSIST, eventCallback, NULL);
         if (NULL == _event)
         {
-            return;
+            // note!!!! if you catch this exception
+            // please remember call the distructure function
+            // !!!!!!! this is important
+            throw std::logic_error(EVENTFD_EVENT_NEW_ERROR);
         }
         if (0 != event_add(_event, NULL))
         {
-            return;
+            // note!!!! if you catch this exception
+            // please remember call the distructure function
+            // !!!!!!! this is important
+            throw std::logic_error(EVENTFD_EVENT_ADD_ERROR);
         }
     }
     virtual ~EventFdServer()
