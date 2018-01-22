@@ -1,5 +1,11 @@
 language: cpp
 
+# safelist
+branches:
+  only:
+  - master
+  - dev
+
 compiler:
   - gcc
 
