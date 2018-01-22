@@ -75,6 +75,10 @@ class TimerManager
 		static TimerManager *ins = new TimerManager();
 		return ins;
 	}
+	Loop &getLoop()
+	{
+		return _loop;
+	}
 	std::mutex mtx;
 
   protected:
