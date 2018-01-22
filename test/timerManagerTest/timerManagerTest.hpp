@@ -33,5 +33,6 @@ int AddCases_timerManager()
 {
     // prepare suit here
     timerManagerSuit->addCase(TM_basic_case);
+    timerManagerSuit->addCase(TM_timerService_case);
     return 0;
 }

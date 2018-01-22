@@ -33,7 +33,7 @@ int main()
 	set_log_level(logger_iface::log_level::error);
 
 	translib::TimerManager::instance()->getTimer()->startForever(1000, [&] {
-		__LOG(warn, "case still running!!!");
+		__LOG(debug, "case still running!!!");
 
 	});
 

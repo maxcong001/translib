@@ -23,8 +23,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include "translib/timerManager.h"
-#include "logger/logger.h"
-#include <iostream>
+
 namespace translib
 {
 
@@ -38,27 +37,18 @@ bool TimerManager::init(bool start)
 	// suppose when the loop stop, the thread will exit then.
 	std::thread timer_thread(work_fun);
 #endif
-	__LOG(warn, "new timer nanager, timer manager thread id is : " << std::hex << std::this_thread::get_id() << ". &loop is : " << ((void *)&_loop));
-	bool ret = false;
 	if (start)
 	{
-		ret = _loop.start(true);
-		__LOG(warn, "loop status is : " << _loop.status());
-		/*
-		while(_loop.status() != translib::Loop::StatusRunning)
-		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(1));
-		}*/
+		_loop.start(true);
 	}
 
-	return ret;
+	return true;
 }
 
 Timer::ptr_p TimerManager::getTimer(int *timerID)
 {
 	int tid = getUniqueID();
 	Timer::ptr_p tmp_ptr(new Timer(_loop));
-	__LOG(warn, "now create a new timer with ID : " << tid);
 	{
 		std::lock_guard<std::mutex> lck(mtx);
 		t_map.emplace(tid, tmp_ptr);

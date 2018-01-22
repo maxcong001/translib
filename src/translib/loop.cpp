@@ -24,8 +24,7 @@
  */
 
 #include "translib/loop.h"
-#include <iostream>
-#include "logger/logger.h"
+
 thread_local translib::Loop *curThreadLoop;
 
 namespace translib
@@ -61,15 +60,11 @@ Loop::Loop() : _id(0),
 
 Loop::~Loop()
 {
-	__LOG(warn, "now exit loop thread,  thread id is : " << std::hex << std::this_thread::get_id() << ". this pointer is : " << ((void *)this));
 	if (NULL != _thread)
 	{
 		stop();
 		wait();
-		// note: we do not need to delete it.
-		// when the thread exit, it will go.
-		//delete _thread;
-		_thread = NULL;
+		delete _thread;
 	}
 
 	if (NULL != _base)
@@ -91,16 +86,13 @@ Loop::~Loop()
 
 bool Loop::start(bool newThread)
 {
-	__LOG(warn, " loop::start is called, newThread is : " << newThread);
 	if (_status != StatusInit)
 	{
-		__LOG(error, "statue is not Init, status is : "<< StatusInit);
 		return false;
 	}
 
 	if (!onBeforeStart())
 	{
-		__LOG(error, "onBeforeStart is not true");
 		return false;
 	}
 
@@ -137,7 +129,6 @@ void Loop::stop(bool waiting)
 
 void Loop::_run()
 {
-	__LOG(warn, "new loop thread,  thread id is : " << std::hex << std::this_thread::get_id() << ". this pointer is : " << ((void *)this));
 	_status = StatusRunning;
 	curThreadLoop = this;
 	onBeforeLoop();
