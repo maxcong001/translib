@@ -48,11 +48,11 @@ void timerManagerExample()
 		__LOG(debug, "the address of timerIDCb001 is : " << (void *)(&timerIDCb001));
 		{
 			auto cbTimer = TM.getTimer(&timerIDCb001);
-			cbTimer->startCB(500, [&](void *usrData) -> int {
-				__LOG(debug, "user data is : " << (void *)usrData);
+			cbTimer->startCB(500, [&](void *usrData, int id) -> int {
+				__LOG(debug, "user data is : " << (void *)usrData << ". id is : " << id);
 				return counter--;
 			},
-							 &timerIDCb001);
+							 &timerIDCb001, timerIDCb001);
 		}
 		loop.start();
 		sleep(2);
@@ -121,11 +121,11 @@ void timerManagerExample()
 		__LOG(debug, "the address of timerIDCb001 is : " << (void *)(&timerIDCb001));
 		{
 			auto cbTimer = TM.getTimer(&timerIDCb001);
-			cbTimer->startCB(100, [&](void *usrData) -> int {
-				__LOG(debug, "user data is : " << (void *)usrData << ". counter is : " << counter);
+			cbTimer->startCB(100, [&](void *usrData, int id) -> int {
+				__LOG(debug, "user data is : " << (void *)usrData << ". id is : " << id << ". counter is : " << counter);
 				return counter--;
 			},
-							 &timerIDCb001);
+							 &timerIDCb001, timerIDCb001);
 		}
 		//loop.start();
 		sleep(2);

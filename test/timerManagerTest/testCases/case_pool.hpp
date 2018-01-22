@@ -27,3 +27,4 @@
 #include "timerManagerTest/testEnv/testEnv.hpp"
 #include "include/testUtil.hpp"
 shared_ptr<test_case_base> TM_basic_case(new test_case_base(TM_basic_env, TM_basic_body, TM_basic_env_destroy, "TM basic case", "basic test of timer manager "));
+shared_ptr<test_case_base> TM_timerService_case(new test_case_base(TM_basic_env, TM_timerService_body, TM_basic_env_destroy, "TM timer service case", "basic test of timer service "));

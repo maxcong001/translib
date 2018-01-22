@@ -32,7 +32,7 @@ namespace translib
 
 class TcpClient : public TcpSocket
 {
-  public:
+public:
 	TcpClient(const translib::Loop &loop);
 
 	inline bool isConnected() const
@@ -42,21 +42,21 @@ class TcpClient : public TcpSocket
 
 	bool connect(const char *ip, uint16_t port);
 
-  protected:
+protected:
 	virtual void onRead(){};
 
 	virtual void onDisconnected(){};
 
 	virtual void onConnected(int error){};
 
-  private:
+private:
 	void handleEvent(short events);
 
 	static void readCallback(struct bufferevent *bev, void *ctx);
 	static void writeCallback(struct bufferevent *bev, void *ctx);
 	static void eventCallback(struct bufferevent *bev, short events, void *ctx);
 
-  private:
+private:
 	const Loop &_loop;
 	std::atomic<bool> _isConnected;
 };

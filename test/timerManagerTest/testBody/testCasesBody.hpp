@@ -38,15 +38,25 @@ case_result TM_basic_body(void *arg)
   __LOG(debug, "the address of timerIDCb001 is : " << (void *)(&timerIDCb001));
   {
     auto cbTimer = TM.getTimer(&timerIDCb001);
-    cbTimer->startCB(500, [&](void *usrData) -> int {
-      __LOG(debug, "user data is : " << (void *)usrData);
+    cbTimer->startCB(500, [&](void *usrData, int id) -> int {
+      __LOG(debug, "user data is : " << (void *)usrData << ". id is : " << id);
       return counter--;
     },
-                     &timerIDCb001);
+                     &timerIDCb001, timerIDCb001);
   }
   loop.start();
   sleep(10);
 
   TM.killTimer(timerIDCb001);
+  return EXCEPT_EQ("test", "test");
+}
+case_result TM_timerService_body(void *arg)
+{
+  int timerID001 = 100;
+  translib::Timer::ptr_p timer001 = translib::TimerManager::instance()->getTimer(&timerID001);
+  timer001->startAfter(1, 100, 2, []() {
+    __LOG(debug, "TM_timerService_body running");
+  });
+  std::this_thread::sleep_for(std::chrono::milliseconds(300));
   return EXCEPT_EQ("test", "test");
 }

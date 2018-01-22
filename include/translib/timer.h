@@ -26,19 +26,17 @@
 #pragma once
 #include "loop.h"
 #include <memory>
-#include "logger/logger.h"
 
 namespace translib
 {
 
 class Loop;
-
 class Timer
 {
   public:
 	/** @brief callback fuction */
 	typedef std::function<void()> Handler;
-	typedef std::function<int(void *)> CBHandler;
+	typedef std::function<int(void *, int)> CBHandler;
 	typedef std::shared_ptr<Timer> ptr_p;
 
   public:
@@ -86,12 +84,13 @@ class Timer
 	 * @param userData bring back while callback is called
 	 */
 
-	bool startCB(uint32_t interval, translib::Timer::CBHandler handler, void *userData)
+	bool startCB(uint32_t interval, translib::Timer::CBHandler handler, void *userData, int tid)
 	{
+		_tid = tid;
 		_userData = userData;
 		_CBHandler = handler;
 		return startForever(interval, [this] {
-			int ret = _CBHandler(_userData);
+			int ret = _CBHandler(_userData, _tid);
 			if (ret == -1)
 			{
 				this->stop();
@@ -141,6 +140,7 @@ class Timer
 	// in case we need to get the user data and callback
 	void *_userData;
 	translib::Timer::CBHandler _CBHandler;
+	int _tid;
 };
 
 } /* namespace translib */

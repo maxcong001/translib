@@ -42,11 +42,11 @@ class TimerManager
   public:
 	TimerManager() : _loop(loop), loop()
 	{
+		init(true);
 		audit_timer = new Timer(_loop);
 		audit_timer->startForever(AUDIT_TIMER, [] {
 			translib::TimerManager::instance()->auditTimer();
 		});
-		init(true);
 	}
 	TimerManager(translib::Loop &loop_in) : _loop(loop_in)
 	{
@@ -58,7 +58,6 @@ class TimerManager
 	}
 	~TimerManager()
 	{
-		__LOG(warn, "destroy timmer manager");
 		//stop audit timer
 		if (!audit_timer)
 		{
@@ -76,12 +75,12 @@ class TimerManager
 		static TimerManager *ins = new TimerManager();
 		return ins;
 	}
-	std::mutex mtx;
-	// get the loop
-	Loop &getLoop()
+	translib::Loop &getLoop()
 	{
 		return _loop;
 	}
+	std::mutex mtx;
+
   protected:
   private:
 	int getUniqueID()

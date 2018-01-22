@@ -63,4 +63,3 @@ void FrameLoop::onFrame()
 }
 
 } /* namespace translib */
-
