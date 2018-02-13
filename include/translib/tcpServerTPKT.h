@@ -87,6 +87,7 @@ public:
           __LOG(warn, "read from input buffer fail!");
         }
         free((void *)buffer_tmp);
+        // do not return here, because there maybe more than one message in the buffer
       }
 
     } while (1);

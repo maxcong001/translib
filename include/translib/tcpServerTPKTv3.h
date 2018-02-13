@@ -44,7 +44,7 @@ public:
         __LOG(debug, "[TcpServerTPKTv3] read " << length << "message, it is less than 1 byte!");
         break;
       }
-      const uint8_t *buf = session->viewInputBuffer(TPKT1_LENGTH);
+      const uint8_t *buf = session->viewInputBuffer(TPKT3_LENGTH);
       if (!buf)
       {
         // note: this could happen when there is no data int he bufferevent!
@@ -86,6 +86,7 @@ public:
           __LOG(warn, "read from input buffer fail!");
         }
         free((void *)buffer_tmp);
+        // do not return here, because there maybe more than one message in the buffer
       }
 
     } while (1);
