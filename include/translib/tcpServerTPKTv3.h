@@ -61,7 +61,7 @@ public:
         session->readInputBuffer(&tmp_buf, 1);
       }
 
-      // 1-byte packet length
+      // 2-byte packet length
       unsigned int packet_length = (((*(buf + 2) & 0xff) << 8) | (*(buf + 3) & 0xff));
       //std::shared_ptr<T> ptr(static_cast<T*>(malloc(sizeof(T))), free);
 
