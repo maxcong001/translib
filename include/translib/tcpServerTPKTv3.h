@@ -63,9 +63,7 @@ public:
 
       // 2-byte packet length
       unsigned int packet_length = (((*(buf + 2) & 0xff) << 8) | (*(buf + 3) & 0xff));
-      //std::shared_ptr<T> ptr(static_cast<T*>(malloc(sizeof(T))), free);
 
-      //length = packet_length - TPKT1_LENGTH;
       if (packet_length > length)
       {
         // some message is still in the air
