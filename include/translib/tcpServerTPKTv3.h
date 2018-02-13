@@ -51,7 +51,8 @@ public:
         __LOG(debug, "[TcpServerTPKTv3] there is no data in the buffer)");
         return;
       }
-
+      // just check the first byte
+      // check the second byte is need? if so add it here
       if (buf[0] != TPKT_VERSION3_LOW_BYTE)
       {
         __LOG(error, "[TcpServerTPKTv3] error!!! TPKT magic number is lost!!");
