@@ -52,7 +52,7 @@ public:
         return;
       }
 
-      if (buf[0] != TPKT_VERSION1_LOW_BYTE)
+      if (buf[0] != TPKT_VERSION3_LOW_BYTE)
       {
         __LOG(error, "[TcpServerTPKTv3] error!!! TPKT magic number is lost!!");
         // read one byte and try again
